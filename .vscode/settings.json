@@ -1,0 +1,8 @@
+{
+    "yaml.schemas": {
+        "https://json.schemastore.org/pubspec.json": [
+            "file:///d%3A/Hari/Personal/projects/Flutter/flutter_application_1/pubspec.yaml",
+            "file:///d%3A/Hari/Personal/projects/Flutter/flutter_application_1/analysis_options.yaml"
+        ]
+    }
+}

@@ -14,7 +14,6 @@ class _HarshaTaskState extends State<HarshaTask> {
   List<Container> textArrayElement = [];
   List<String> textArray = [];
   late String noteEntered;
-  TextEditingController noteTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
