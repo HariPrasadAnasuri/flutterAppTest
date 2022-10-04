@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import 'assets/constants.dart' as constants;
+
 class HarshaTask extends StatefulWidget {
   const HarshaTask({super.key});
 
@@ -10,9 +12,10 @@ class HarshaTask extends StatefulWidget {
   State<HarshaTask> createState() => _HarshaTaskState();
 }
 
+List<Container> textArrayElement = [];
+List<String> textArray = [];
+
 class _HarshaTaskState extends State<HarshaTask> {
-  List<Container> textArrayElement = [];
-  List<String> textArray = [];
   late String noteEntered;
 
   @override
@@ -116,7 +119,7 @@ class _HarshaTaskState extends State<HarshaTask> {
               onPressed: () async {
                 String questData = textArray.join(",");
                 var url = Uri.parse(
-                    "https://0a21-2405-201-c018-400b-9393-8827-a9b-ab52.in.ngrok.io/addQuestData?questDataString=$questData");
+                    "${constants.raspberryAppUrl}/addQuestData?questDataString=$questData");
                 // var url = Uri.parse(
                 //     "http://10.0.2.2:8071/addQuestData?questDataString=$questData - delete");
                 debugPrint("URL $url");
