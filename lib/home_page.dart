@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/alexa_voice_says.dart';
 import 'package:flutter_application_1/harsha_task.dart';
 import 'package:flutter_application_1/learn_flutter_page.dart';
+import 'package:flutter_application_1/manage_photos.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -30,6 +31,10 @@ class HomePage extends StatelessWidget {
           child: Center(
               child: Column(children: [
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                minimumSize: const Size.fromHeight(50),
+              ),
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -42,6 +47,10 @@ class HomePage extends StatelessWidget {
               child: const Text('Learn Flutter'),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                minimumSize: const Size.fromHeight(50),
+              ),
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -54,6 +63,10 @@ class HomePage extends StatelessWidget {
               child: const Text('Create harsha task'),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.yellow,
+                minimumSize: const Size.fromHeight(50),
+              ),
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -64,6 +77,22 @@ class HomePage extends StatelessWidget {
                 );
               },
               child: const Text('Alexa voices'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.yellow,
+                minimumSize: const Size.fromHeight(50),
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext buildContext) {
+                      return const ManagePhotos();
+                    },
+                  ),
+                );
+              },
+              child: const Text('Manage photos'),
             )
           ])),
         ));
