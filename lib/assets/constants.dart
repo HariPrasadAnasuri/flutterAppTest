@@ -4,3 +4,5 @@ const String hariAnnouncement =
     'https://api.voicemonkey.io/trigger?access_token=aefdfde159807039f4c21fa0a5fe3680&secret_token=811ba0df7e31c018095aa378843aceb5&monkey=monkey-announcement-for-hari&announcement=';
 const String hallAnnouncement =
     'https://api.voicemonkey.io/trigger?access_token=aefdfde159807039f4c21fa0a5fe3680&secret_token=811ba0df7e31c018095aa378843aceb5&monkey=monkeyannouncementforhall&announcement=';
+const String photoUrl =
+    'http://[2405:201:c018:4016:ccf9:19b1:49dc:b1f4]:7000/photos/';

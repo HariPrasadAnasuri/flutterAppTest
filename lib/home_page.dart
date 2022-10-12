@@ -80,7 +80,7 @@ class HomePage extends StatelessWidget {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.yellow,
+                backgroundColor: Colors.cyan,
                 minimumSize: const Size.fromHeight(50),
               ),
               onPressed: () {
