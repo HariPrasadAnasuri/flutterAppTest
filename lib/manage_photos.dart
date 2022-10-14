@@ -1,11 +1,13 @@
 // ignore_for_file: unnecessary_const, prefer_interpolation_to_compose_strings
 
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pinch_zoom_image.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:http/http.dart' as http;
+//import 'package:localstorage/localstorage.dart';
 
 import 'assets/constants.dart' as constants;
 
@@ -16,6 +18,7 @@ class ManagePhotos extends StatefulWidget {
   State<ManagePhotos> createState() => _ManagePhotosState();
 }
 
+//final LocalStorage storage = LocalStorage('localstorage_app');
 List<Container> textArrayElement = [];
 List<String> textArray = [];
 int currentPageSelected = 0;
@@ -24,74 +27,193 @@ PinchZoomImage pinchZoomImage = PinchZoomImage();
 class _ManagePhotosState extends State<ManagePhotos> {
   late String noteEntered;
 
+  void getFileInfo() async {
+    String testUrl = '${AppValues.host}/photos/${AppValues.index}/fileInfo';
+    var url = Uri.parse(testUrl);
+    debugPrint("Url to get the file info $url");
+    var result = await http.get(url);
+    setState(() {
+      var response = jsonDecode(result.body);
+      int selectedState = 0;
+      if (response['tobeDeleted'] != null && response['tobeDeleted']) {
+        selectedState = 2;
+      } else if (response['important'] != null && response['important']) {
+        selectedState = 1;
+      } else if (response['visited'] != null && response['visited']) {
+        selectedState = 0;
+      }
+
+      currentPageSelected = selectedState;
+      debugPrint("currentPageSelected: $currentPageSelected");
+      debugPrint("result.body: ${result.body}");
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // if (storage.getItem('lastIndex') == null) {
+    //   storage.setItem('lastIndex', 0);
+    // }
+    //AppValues.index = storage.getItem('lastIndex');
+    debugPrint("Index in managePhoto: ${AppValues.index}");
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage photos'),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          icon: const Icon(Icons.arrow_back_ios),
+    return WillPopScope(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Manage photos'),
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios),
+          ),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  debugPrint("Actions");
+                },
+                icon: const Icon(Icons.info))
+          ],
         ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                debugPrint("Actions");
-              },
-              icon: const Icon(Icons.info))
-        ],
-      ),
-      body: Center(
-        child: pinchZoomImage,
-      ),
-      bottomNavigationBar: NavigationBar(
-        destinations: const [
-          NavigationDestination(
-              icon: Icon(Icons.navigate_before_rounded), label: 'Prev'),
-          NavigationDestination(icon: Icon(Icons.view_array), label: 'Visited'),
-          NavigationDestination(
-              icon: Icon(Icons.label_important), label: 'Important'),
-          NavigationDestination(icon: Icon(Icons.delete), label: 'Delete'),
-          NavigationDestination(
-              icon: Icon(Icons.navigate_next_rounded), label: 'Next')
-        ],
-        onDestinationSelected: (int index) async {
-          setState(() {
-            currentPageSelected = index;
-            if (index == 4) {
-              AppValues.index = ++AppValues.index;
-              AppValues.imagesUrl = '${constants.photoUrl}${AppValues.index}';
-              debugPrint("AppValues.imagesUrl ${AppValues.imagesUrl}");
-            }
+        body: Column(
+          children: [
+            const SizedBox(),
+            Center(
+              child: pinchZoomImage,
+            ),
+            const SizedBox(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Align(
+                    alignment: Alignment.bottomLeft,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          AppValues.index = --AppValues.index;
+                          AppValues.imagesUrl =
+                              '${constants.photoUrl}${AppValues.index}';
+                          debugPrint(
+                              "AppValues.imagesUrl ${AppValues.imagesUrl}");
+                          pinchZoomImage = PinchZoomImage();
+                          debugPrint("Index value: ${AppValues.index}");
+                          //storage.setItem('lastIndex', AppValues.index);
+                          getFileInfo();
+                        });
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(10.0),
+                              bottomRight: Radius.circular(10.0),
+                              topLeft: Radius.circular(10.0),
+                              bottomLeft: Radius.circular(10.0)),
+                        ),
+                        height: 100,
+                        padding: const EdgeInsets.all(16),
+                        // Change button text when light changes state.
+                        child: const Text(
+                          'Prev',
+                          style: TextStyle(color: Colors.yellow, fontSize: 30),
+                        ),
+                      ),
+                    )),
+                Align(
+                    alignment: Alignment.bottomLeft,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          AppValues.index = ++AppValues.index;
+                          AppValues.imagesUrl =
+                              '${constants.photoUrl}${AppValues.index}';
+                          debugPrint(
+                              "AppValues.imagesUrl ${AppValues.imagesUrl}");
+                          pinchZoomImage = PinchZoomImage();
+                          debugPrint("Index value: ${AppValues.index}");
+                          //storage.setItem('lastIndex', AppValues.index);
+                          getFileInfo();
+                        });
+                      },
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                          borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(10.0),
+                              bottomRight: Radius.circular(10.0),
+                              topLeft: Radius.circular(10.0),
+                              bottomLeft: Radius.circular(10.0)),
+                        ),
+                        height: 100,
+                        padding: const EdgeInsets.all(16),
+                        // Change button text when light changes state.
+                        child: const Text(
+                          'Next',
+                          style: TextStyle(color: Colors.yellow, fontSize: 30),
+                        ),
+                      ),
+                    )),
+              ],
+            ),
+          ],
+        ),
+        bottomNavigationBar: NavigationBar(
+          backgroundColor: Colors.green[100],
+          surfaceTintColor: Colors.red,
+          destinations: const [
+            NavigationDestination(
+                icon: Icon(Icons.view_array, color: Colors.blue),
+                label: 'Visited'),
+            NavigationDestination(
+                icon: Icon(Icons.label_important, color: Colors.green),
+                label: 'Important'),
+            NavigationDestination(
+                icon: Icon(Icons.delete, color: Colors.red), label: 'Delete'),
+          ],
+          onDestinationSelected: (int index) async {
+            var url;
             if (index == 0) {
-              AppValues.index = --AppValues.index;
-              AppValues.imagesUrl = '${constants.photoUrl}${AppValues.index}';
-              debugPrint("AppValues.imagesUrl ${AppValues.imagesUrl}");
+              setState(() {
+                url = Uri.parse(AppValues.getMarkAsVisitedUrl());
+                debugPrint("URL $url");
+              });
+
+              await http.get(url);
             }
-            pinchZoomImage = PinchZoomImage();
-            debugPrint("Index value: ${AppValues.index}");
-          });
-          if (index == 1) {
-            var url = Uri.parse(AppValues.markAsVisitedUrl);
-            debugPrint("URL $url");
-            await http.get(url);
-          }
-          if (index == 2) {
-            var url = Uri.parse(AppValues.markAsImportantUrl);
-            debugPrint("URL $url");
-            await http.get(url);
-          }
-          if (index == 3) {
-            var url = Uri.parse(AppValues.markAsRemoveUrl);
-            debugPrint("URL $url");
-            await http.get(url);
-          }
-        },
-        selectedIndex: currentPageSelected,
+            if (index == 1) {
+              setState(() {
+                url = Uri.parse(AppValues.getMarkImportantUrl());
+                debugPrint("URL $url");
+              });
+
+              await http.get(url);
+            }
+            if (index == 2) {
+              setState(() {
+                url = Uri.parse(AppValues.getMarkAsRemoveUrll());
+                debugPrint("URL $url");
+              });
+              await http.get(url);
+            }
+            var toUpdateIndexUrl = Uri.parse(AppValues.getSetCurrentIndexUrl());
+            debugPrint("toUpdateIndexUrl $toUpdateIndexUrl");
+            await http.get(toUpdateIndexUrl);
+
+            setState(() {
+              currentPageSelected = index;
+            });
+          },
+          selectedIndex: currentPageSelected,
+        ),
       ),
+      onWillPop: () async {
+        return false;
+      },
     );
   }
 }

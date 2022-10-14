@@ -91,7 +91,7 @@ class _PinchZoomImageState extends State<PinchZoomImage>
     final size = MediaQuery.of(context).size;
 
     entry = OverlayEntry(builder: ((context) {
-      double opacity = ((scale - 1) / (maxScale - 1)).clamp(0, 1);
+      double opacity = ((scale - 1) / (maxScale - 1)).clamp(0.2, 1);
       return Stack(
         children: <Widget>[
           Positioned.fill(
