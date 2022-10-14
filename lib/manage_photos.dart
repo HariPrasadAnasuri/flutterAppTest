@@ -26,7 +26,7 @@ PinchZoomImage pinchZoomImage = PinchZoomImage();
 
 class _ManagePhotosState extends State<ManagePhotos> {
   late String noteEntered;
-
+  late String panDirection;
   void getFileInfo() async {
     String testUrl = '${AppValues.host}/photos/${AppValues.index}/fileInfo';
     var url = Uri.parse(testUrl);
@@ -82,18 +82,21 @@ class _ManagePhotosState extends State<ManagePhotos> {
         ),
         body: Column(
           children: [
-            const SizedBox(),
-            Center(
-              child: pinchZoomImage,
-            ),
-            const SizedBox(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Align(
-                    alignment: Alignment.bottomLeft,
-                    child: GestureDetector(
-                      onTap: () {
+            Expanded(
+                child: GestureDetector(
+                    onHorizontalDragUpdate: (details) {
+                      // Note: Sensitivity is integer used when you don't want to mess up vertical drag
+                      int threshold = 3;
+                      if (details.delta.dx > threshold) {
+                        panDirection = "right";
+                      }
+                      if (details.delta.dx < -threshold) {
+                        panDirection = "left";
+                      }
+                    },
+                    onHorizontalDragEnd: (details) {
+                      debugPrint("panDirection $panDirection");
+                      if (panDirection == 'left') {
                         setState(() {
                           AppValues.index = --AppValues.index;
                           AppValues.imagesUrl =
@@ -102,32 +105,10 @@ class _ManagePhotosState extends State<ManagePhotos> {
                               "AppValues.imagesUrl ${AppValues.imagesUrl}");
                           pinchZoomImage = PinchZoomImage();
                           debugPrint("Index value: ${AppValues.index}");
-                          //storage.setItem('lastIndex', AppValues.index);
                           getFileInfo();
                         });
-                      },
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(10.0),
-                              bottomRight: Radius.circular(10.0),
-                              topLeft: Radius.circular(10.0),
-                              bottomLeft: Radius.circular(10.0)),
-                        ),
-                        height: 100,
-                        padding: const EdgeInsets.all(16),
-                        // Change button text when light changes state.
-                        child: const Text(
-                          'Prev',
-                          style: TextStyle(color: Colors.yellow, fontSize: 30),
-                        ),
-                      ),
-                    )),
-                Align(
-                    alignment: Alignment.bottomLeft,
-                    child: GestureDetector(
-                      onTap: () {
+                      }
+                      if (panDirection == 'right') {
                         setState(() {
                           AppValues.index = ++AppValues.index;
                           AppValues.imagesUrl =
@@ -136,30 +117,84 @@ class _ManagePhotosState extends State<ManagePhotos> {
                               "AppValues.imagesUrl ${AppValues.imagesUrl}");
                           pinchZoomImage = PinchZoomImage();
                           debugPrint("Index value: ${AppValues.index}");
-                          //storage.setItem('lastIndex', AppValues.index);
                           getFileInfo();
                         });
-                      },
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(10.0),
-                              bottomRight: Radius.circular(10.0),
-                              topLeft: Radius.circular(10.0),
-                              bottomLeft: Radius.circular(10.0)),
-                        ),
-                        height: 100,
-                        padding: const EdgeInsets.all(16),
-                        // Change button text when light changes state.
-                        child: const Text(
-                          'Next',
-                          style: TextStyle(color: Colors.yellow, fontSize: 30),
-                        ),
-                      ),
-                    )),
-              ],
-            ),
+                      }
+                    },
+                    child: pinchZoomImage)),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     Align(
+            //         alignment: Alignment.bottomLeft,
+            //         child: GestureDetector(
+            //           onTap: () {
+            //             setState(() {
+            //               AppValues.index = --AppValues.index;
+            //               AppValues.imagesUrl =
+            //                   '${constants.photoUrl}${AppValues.index}';
+            //               debugPrint(
+            //                   "AppValues.imagesUrl ${AppValues.imagesUrl}");
+            //               pinchZoomImage = PinchZoomImage();
+            //               debugPrint("Index value: ${AppValues.index}");
+            //               //storage.setItem('lastIndex', AppValues.index);
+            //               getFileInfo();
+            //             });
+            //           },
+            //           child: Container(
+            //             decoration: const BoxDecoration(
+            //               color: Colors.blue,
+            //               borderRadius: BorderRadius.only(
+            //                   topRight: Radius.circular(10.0),
+            //                   bottomRight: Radius.circular(10.0),
+            //                   topLeft: Radius.circular(10.0),
+            //                   bottomLeft: Radius.circular(10.0)),
+            //             ),
+            //             height: 100,
+            //             padding: const EdgeInsets.all(16),
+            //             // Change button text when light changes state.
+            //             child: const Text(
+            //               'Prev',
+            //               style: TextStyle(color: Colors.yellow, fontSize: 30),
+            //             ),
+            //           ),
+            //         )),
+            //     Align(
+            //         alignment: Alignment.bottomLeft,
+            //         child: GestureDetector(
+            //           onTap: () {
+            //             setState(() {
+            //               AppValues.index = ++AppValues.index;
+            //               AppValues.imagesUrl =
+            //                   '${constants.photoUrl}${AppValues.index}';
+            //               debugPrint(
+            //                   "AppValues.imagesUrl ${AppValues.imagesUrl}");
+            //               pinchZoomImage = PinchZoomImage();
+            //               debugPrint("Index value: ${AppValues.index}");
+            //               //storage.setItem('lastIndex', AppValues.index);
+            //               getFileInfo();
+            //             });
+            //           },
+            //           child: Container(
+            //             decoration: const BoxDecoration(
+            //               color: Colors.blue,
+            //               borderRadius: BorderRadius.only(
+            //                   topRight: Radius.circular(10.0),
+            //                   bottomRight: Radius.circular(10.0),
+            //                   topLeft: Radius.circular(10.0),
+            //                   bottomLeft: Radius.circular(10.0)),
+            //             ),
+            //             height: 100,
+            //             padding: const EdgeInsets.all(16),
+            //             // Change button text when light changes state.
+            //             child: const Text(
+            //               'Next',
+            //               style: TextStyle(color: Colors.yellow, fontSize: 30),
+            //             ),
+            //           ),
+            //         )),
+            //   ],
+            // ),
           ],
         ),
         bottomNavigationBar: NavigationBar(

@@ -1,7 +1,7 @@
 class AppValues {
   static int index = 0;
-  // static String host = 'http://[2405:201:c018:4016:ccf9:19b1:49dc:b1f4]:7000';
-  static String host = 'http://[2405:201:c018:4016:b24a:eaf9:f5d2:b35]:7000';
+  //static String host = 'http://[2405:201:c018:4016:b24a:eaf9:f5d2:b35]:7000';
+  static String host = 'http://192.168.29.49:7000';
   static String imagesUrl = '$host/photos/$index';
   static String getFileInfoUrl = '$host/photos/$index/fileInfo';
   static String myName = "";

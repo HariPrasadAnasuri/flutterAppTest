@@ -47,6 +47,7 @@ class _PinchZoomImageState extends State<PinchZoomImage>
     return Center(
       child: Builder(builder: (context) {
         return InteractiveViewer(
+          scaleEnabled: true,
           transformationController: controller,
           clipBehavior: Clip.none,
           minScale: minScale,
@@ -63,13 +64,7 @@ class _PinchZoomImageState extends State<PinchZoomImage>
           onInteractionEnd: ((details) {
             resetAnimation();
           }),
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(30),
-              child: Image.network(fit: BoxFit.cover, AppValues.imagesUrl),
-            ),
-          ),
+          child: Image.network(fit: BoxFit.cover, AppValues.imagesUrl),
         );
       }),
     );
@@ -80,7 +75,7 @@ class _PinchZoomImageState extends State<PinchZoomImage>
       begin: controller.value,
       end: Matrix4.identity(),
     ).animate(
-      CurvedAnimation(parent: animationController, curve: Curves.easeIn),
+      CurvedAnimation(parent: animationController, curve: Curves.ease),
     );
     animationController.forward(from: 0);
   }
@@ -94,18 +89,18 @@ class _PinchZoomImageState extends State<PinchZoomImage>
       double opacity = ((scale - 1) / (maxScale - 1)).clamp(0.2, 1);
       return Stack(
         children: <Widget>[
-          Positioned.fill(
-            child: Opacity(
-              opacity: opacity,
-              child: Container(color: Colors.black),
-            ),
-          ),
           Positioned(
             left: offset.dx,
             top: offset.dy,
             width: size.width,
             child: buildImage(),
           ),
+          Positioned.fill(
+            child: Opacity(
+              opacity: opacity,
+              child: Container(color: Colors.black),
+            ),
+          )
         ],
       );
     }));
@@ -113,14 +108,8 @@ class _PinchZoomImageState extends State<PinchZoomImage>
     overlay.insert(entry!);
   }
 
-  AspectRatio buildImage() {
-    return AspectRatio(
-      aspectRatio: 1,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
-        child: Image.network(fit: BoxFit.cover, AppValues.imagesUrl),
-      ),
-    );
+  Image buildImage() {
+    return Image.network(fit: BoxFit.cover, AppValues.imagesUrl);
   }
 
   void removeOverlay() {
