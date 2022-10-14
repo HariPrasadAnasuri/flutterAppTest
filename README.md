@@ -16,5 +16,6 @@ For help getting started with Flutter development, view the
 samples, guidance on mobile development, and a full API reference.
 
 
-
+adb tcpip 5555
+adb connect  192.168.29.188:5555
 adb uninstall "com.example.flutter_application_1"
