@@ -10,7 +10,7 @@ class PinchZoomImage extends StatefulWidget {
 class _PinchZoomImageState extends State<PinchZoomImage>
     with SingleTickerProviderStateMixin {
   final double minScale = 1;
-  final double maxScale = 4;
+  final double maxScale = 6;
   double scale = 1;
   late TransformationController controller;
   late AnimationController animationController;
@@ -47,23 +47,13 @@ class _PinchZoomImageState extends State<PinchZoomImage>
     return Center(
       child: Builder(builder: (context) {
         return InteractiveViewer(
+          constrained: false,
           scaleEnabled: true,
-          transformationController: controller,
+          panEnabled: true,
+          minScale: 0.06,
+          maxScale: 4.0,
+          boundaryMargin: const EdgeInsets.all(double.infinity),
           clipBehavior: Clip.none,
-          minScale: minScale,
-          maxScale: maxScale,
-          onInteractionStart: (details) {
-            if (details.pointerCount < 2) return;
-            showOverlay(context);
-          },
-          onInteractionUpdate: (details) {
-            if (entry == null) return;
-            scale = details.scale;
-            entry!.markNeedsBuild();
-          },
-          onInteractionEnd: ((details) {
-            resetAnimation();
-          }),
           child: Image.network(fit: BoxFit.cover, AppValues.imagesUrl),
         );
       }),

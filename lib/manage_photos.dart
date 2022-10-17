@@ -27,7 +27,7 @@ PinchZoomImage pinchZoomImage = PinchZoomImage();
 class _ManagePhotosState extends State<ManagePhotos> {
   late String noteEntered;
   late String panDirection;
-  void getFileInfo() async {
+  void getFileInfoAndUpdateStatus() async {
     String testUrl = '${AppValues.host}/photos/${AppValues.index}/fileInfo';
     var url = Uri.parse(testUrl);
     debugPrint("Url to get the file info $url");
@@ -36,11 +36,11 @@ class _ManagePhotosState extends State<ManagePhotos> {
       var response = jsonDecode(result.body);
       int selectedState = 0;
       if (response['tobeDeleted'] != null && response['tobeDeleted']) {
-        selectedState = 2;
+        selectedState = 3;
       } else if (response['important'] != null && response['important']) {
-        selectedState = 1;
+        selectedState = 2;
       } else if (response['visited'] != null && response['visited']) {
-        selectedState = 0;
+        selectedState = 1;
       }
 
       currentPageSelected = selectedState;
@@ -61,194 +61,90 @@ class _ManagePhotosState extends State<ManagePhotos> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Manage photos'),
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios),
-          ),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  debugPrint("Actions");
-                },
-                icon: const Icon(Icons.info))
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-                child: GestureDetector(
-                    onHorizontalDragUpdate: (details) {
-                      // Note: Sensitivity is integer used when you don't want to mess up vertical drag
-                      int threshold = 3;
-                      if (details.delta.dx > threshold) {
-                        panDirection = "right";
-                      }
-                      if (details.delta.dx < -threshold) {
-                        panDirection = "left";
-                      }
-                    },
-                    onHorizontalDragEnd: (details) {
-                      debugPrint("panDirection $panDirection");
-                      if (panDirection == 'left') {
-                        setState(() {
-                          AppValues.index = --AppValues.index;
-                          AppValues.imagesUrl =
-                              '${constants.photoUrl}${AppValues.index}';
-                          debugPrint(
-                              "AppValues.imagesUrl ${AppValues.imagesUrl}");
-                          pinchZoomImage = PinchZoomImage();
-                          debugPrint("Index value: ${AppValues.index}");
-                          getFileInfo();
-                        });
-                      }
-                      if (panDirection == 'right') {
-                        setState(() {
-                          AppValues.index = ++AppValues.index;
-                          AppValues.imagesUrl =
-                              '${constants.photoUrl}${AppValues.index}';
-                          debugPrint(
-                              "AppValues.imagesUrl ${AppValues.imagesUrl}");
-                          pinchZoomImage = PinchZoomImage();
-                          debugPrint("Index value: ${AppValues.index}");
-                          getFileInfo();
-                        });
-                      }
-                    },
-                    child: pinchZoomImage)),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     Align(
-            //         alignment: Alignment.bottomLeft,
-            //         child: GestureDetector(
-            //           onTap: () {
-            //             setState(() {
-            //               AppValues.index = --AppValues.index;
-            //               AppValues.imagesUrl =
-            //                   '${constants.photoUrl}${AppValues.index}';
-            //               debugPrint(
-            //                   "AppValues.imagesUrl ${AppValues.imagesUrl}");
-            //               pinchZoomImage = PinchZoomImage();
-            //               debugPrint("Index value: ${AppValues.index}");
-            //               //storage.setItem('lastIndex', AppValues.index);
-            //               getFileInfo();
-            //             });
-            //           },
-            //           child: Container(
-            //             decoration: const BoxDecoration(
-            //               color: Colors.blue,
-            //               borderRadius: BorderRadius.only(
-            //                   topRight: Radius.circular(10.0),
-            //                   bottomRight: Radius.circular(10.0),
-            //                   topLeft: Radius.circular(10.0),
-            //                   bottomLeft: Radius.circular(10.0)),
-            //             ),
-            //             height: 100,
-            //             padding: const EdgeInsets.all(16),
-            //             // Change button text when light changes state.
-            //             child: const Text(
-            //               'Prev',
-            //               style: TextStyle(color: Colors.yellow, fontSize: 30),
-            //             ),
-            //           ),
-            //         )),
-            //     Align(
-            //         alignment: Alignment.bottomLeft,
-            //         child: GestureDetector(
-            //           onTap: () {
-            //             setState(() {
-            //               AppValues.index = ++AppValues.index;
-            //               AppValues.imagesUrl =
-            //                   '${constants.photoUrl}${AppValues.index}';
-            //               debugPrint(
-            //                   "AppValues.imagesUrl ${AppValues.imagesUrl}");
-            //               pinchZoomImage = PinchZoomImage();
-            //               debugPrint("Index value: ${AppValues.index}");
-            //               //storage.setItem('lastIndex', AppValues.index);
-            //               getFileInfo();
-            //             });
-            //           },
-            //           child: Container(
-            //             decoration: const BoxDecoration(
-            //               color: Colors.blue,
-            //               borderRadius: BorderRadius.only(
-            //                   topRight: Radius.circular(10.0),
-            //                   bottomRight: Radius.circular(10.0),
-            //                   topLeft: Radius.circular(10.0),
-            //                   bottomLeft: Radius.circular(10.0)),
-            //             ),
-            //             height: 100,
-            //             padding: const EdgeInsets.all(16),
-            //             // Change button text when light changes state.
-            //             child: const Text(
-            //               'Next',
-            //               style: TextStyle(color: Colors.yellow, fontSize: 30),
-            //             ),
-            //           ),
-            //         )),
-            //   ],
-            // ),
-          ],
-        ),
-        bottomNavigationBar: NavigationBar(
-          backgroundColor: Colors.green[100],
-          surfaceTintColor: Colors.red,
-          destinations: const [
-            NavigationDestination(
-                icon: Icon(Icons.view_array, color: Colors.blue),
-                label: 'Visited'),
-            NavigationDestination(
-                icon: Icon(Icons.label_important, color: Colors.green),
-                label: 'Important'),
-            NavigationDestination(
-                icon: Icon(Icons.delete, color: Colors.red), label: 'Delete'),
-          ],
-          onDestinationSelected: (int index) async {
-            var url;
-            if (index == 0) {
-              setState(() {
-                url = Uri.parse(AppValues.getMarkAsVisitedUrl());
-                debugPrint("URL $url");
-              });
+    return Scaffold(
+      body: Column(
+        children: [
+          Expanded(child: pinchZoomImage),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        height: 50,
+        backgroundColor: Colors.green[100],
+        surfaceTintColor: Colors.red,
+        destinations: const [
+          NavigationDestination(
+              icon: Icon(Icons.arrow_back_ios_sharp, color: Colors.blue),
+              label: 'Prev'),
+          NavigationDestination(
+              icon: Icon(Icons.view_array, color: Colors.blue),
+              label: 'Visited'),
+          NavigationDestination(
+              icon: Icon(Icons.label_important, color: Colors.green),
+              label: 'Important'),
+          NavigationDestination(
+              icon: Icon(Icons.delete, color: Colors.red), label: 'Delete'),
+          NavigationDestination(
+              icon: Icon(Icons.arrow_forward_ios_sharp, color: Colors.blue),
+              label: 'Next'),
+        ],
+        onDestinationSelected: (int index) async {
+          var url;
+          if (index == 0) {
+            setState(() {
+              AppValues.index = --AppValues.index;
+              AppValues.imagesUrl = '${constants.photoUrl}${AppValues.index}';
+              debugPrint("AppValues.imagesUrl ${AppValues.imagesUrl}");
+              pinchZoomImage = PinchZoomImage();
+              debugPrint("Index value: ${AppValues.index}");
+              //storage.setItem('lastIndex', AppValues.index);
+              getFileInfoAndUpdateStatus();
+            });
+          }
+          if (index == 1) {
+            setState(() {
+              url = Uri.parse(AppValues.getMarkAsVisitedUrl());
+              debugPrint("URL $url");
+            });
 
-              await http.get(url);
-            }
-            if (index == 1) {
-              setState(() {
-                url = Uri.parse(AppValues.getMarkImportantUrl());
-                debugPrint("URL $url");
-              });
+            await http.get(url);
+          }
+          if (index == 2) {
+            setState(() {
+              url = Uri.parse(AppValues.getMarkImportantUrl());
+              debugPrint("URL $url");
+            });
 
-              await http.get(url);
-            }
-            if (index == 2) {
-              setState(() {
-                url = Uri.parse(AppValues.getMarkAsRemoveUrll());
-                debugPrint("URL $url");
-              });
-              await http.get(url);
-            }
+            await http.get(url);
+          }
+          if (index == 3) {
+            setState(() {
+              url = Uri.parse(AppValues.getMarkAsRemoveUrll());
+              debugPrint("URL $url");
+            });
+            await http.get(url);
+          }
+          if (index == 1 || index == 2 || index == 3) {
             var toUpdateIndexUrl = Uri.parse(AppValues.getSetCurrentIndexUrl());
             debugPrint("toUpdateIndexUrl $toUpdateIndexUrl");
             await http.get(toUpdateIndexUrl);
-
+          }
+          if (index == 4) {
             setState(() {
-              currentPageSelected = index;
+              AppValues.index = ++AppValues.index;
+              AppValues.imagesUrl = '${constants.photoUrl}${AppValues.index}';
+              debugPrint("AppValues.imagesUrl ${AppValues.imagesUrl}");
+              pinchZoomImage = PinchZoomImage();
+              debugPrint("Index value: ${AppValues.index}");
+              //storage.setItem('lastIndex', AppValues.index);
+              getFileInfoAndUpdateStatus();
             });
-          },
-          selectedIndex: currentPageSelected,
-        ),
+          }
+          setState(() {
+            currentPageSelected = index;
+          });
+        },
+        selectedIndex: currentPageSelected,
       ),
-      onWillPop: () async {
-        return false;
-      },
     );
   }
 }
