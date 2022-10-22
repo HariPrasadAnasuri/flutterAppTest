@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
           ),
           onPressed: () async {
             if (textEntered.isNotEmpty) {
-              AppValues.myName = dropdownValue;
+              AppValues.userName = dropdownValue;
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (BuildContext buildContext) {
@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> {
             setState(() {
               dropdownValue = value!;
               debugPrint("sayEntered: $dropdownValue");
-              AppValues.myName = dropdownValue;
+              AppValues.userName = dropdownValue;
             });
           },
           items: list.map<DropdownMenuItem<String>>((String value) {
@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> {
           ),
           onPressed: () async {
             if (dropdownValue.isNotEmpty) {
-              AppValues.myName = dropdownValue;
+              AppValues.userName = dropdownValue;
               debugPrint("Going for list photos");
               Navigator.of(context).push(
                 MaterialPageRoute(

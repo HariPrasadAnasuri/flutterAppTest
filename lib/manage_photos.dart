@@ -28,7 +28,7 @@ class _ManagePhotosState extends State<ManagePhotos> {
   late String noteEntered;
   late String panDirection;
   void getFileInfoAndUpdateStatus() async {
-    String testUrl = '${AppValues.host}/photos/${AppValues.index}/fileInfo';
+    String testUrl = '${AppValues.host}/photos/${AppValues.fileId}/fileInfo';
     var url = Uri.parse(testUrl);
     debugPrint("Url to get the file info $url");
     var result = await http.get(url);
@@ -56,7 +56,7 @@ class _ManagePhotosState extends State<ManagePhotos> {
     //   storage.setItem('lastIndex', 0);
     // }
     //AppValues.index = storage.getItem('lastIndex');
-    debugPrint("Index in managePhoto: ${AppValues.index}");
+    debugPrint("Index in managePhoto: ${AppValues.fileId}");
   }
 
   @override

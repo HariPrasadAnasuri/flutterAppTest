@@ -43,7 +43,7 @@ class _ListPhotosState extends State<ListPhotos> {
   }
 
   void getFileInfoAndUpdateStatus() async {
-    String testUrl = '${AppValues.host}/photos/${AppValues.index}/fileInfo';
+    String testUrl = '${AppValues.host}/photos/${AppValues.fileId}/fileInfo';
     var url = Uri.parse(testUrl);
     debugPrint("Url to get the file info $url");
     var result = await http.get(url);
@@ -79,107 +79,107 @@ class _ListPhotosState extends State<ListPhotos> {
   }
 
   @override
-  double get minScrollExtent => _minScrollExtent;
-  double _minScrollExtent = 0.0;
-
-  @override
-  double get maxScrollExtent => _maxScrollExtent;
-  double _maxScrollExtent = 0.0;
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.arrow_forward),
-          onPressed: () {
-            //final nextIndex = controller.selectedItem + 1;
-            // controller.animateToItem(nextIndex,
-            //     duration: const Duration(seconds: 1), curve: Curves.easeInOut);
-            AppValues.index = selectedImageId;
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext buildContext) {
-                  return const ManagePhotos();
-                },
-              ),
-            );
-          },
-        ),
-        bottomNavigationBar: NavigationBar(
-          height: 50,
-          backgroundColor: Colors.green[100],
-          surfaceTintColor: Colors.red,
-          destinations: const [
-            NavigationDestination(
-                icon: Icon(Icons.refresh, color: Colors.blue),
-                label: 'Refresh'),
-            NavigationDestination(
-                icon: Icon(Icons.view_array, color: Colors.blue),
-                label: 'Visited'),
-            NavigationDestination(
-                icon: Icon(Icons.label_important, color: Colors.green),
-                label: 'Important'),
-            NavigationDestination(
-                icon: Icon(Icons.delete, color: Colors.red), label: 'Delete'),
-          ],
-          onDestinationSelected: (int index) async {
-            var url;
-            if (index == 0) {
-              getsetOfImages();
-            }
-            if (index == 1) {
-              setState(() {
-                AppValues.index = selectedImageId;
-                url = Uri.parse(AppValues.getMarkAsVisitedUrl());
-                debugPrint("URL $url");
-              });
-
-              await http.get(url);
-            }
-            if (index == 2) {
-              setState(() {
-                AppValues.index = selectedImageId;
-                url = Uri.parse(AppValues.getMarkImportantUrl());
-                debugPrint("URL $url");
-              });
-
-              await http.get(url);
-            }
-            if (index == 3) {
-              setState(() {
-                AppValues.index = selectedImageId;
-                url = Uri.parse(AppValues.getMarkAsRemoveUrll());
-                debugPrint("URL $url");
-              });
-              await http.get(url);
-            }
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.arrow_forward),
+        onPressed: () {
+          //final nextIndex = controller.selectedItem + 1;
+          // controller.animateToItem(nextIndex,
+          //     duration: const Duration(seconds: 1), curve: Curves.easeInOut);
+          AppValues.fileId = selectedImageId;
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (BuildContext buildContext) {
+                return const ManagePhotos();
+              },
+            ),
+          );
+        },
+      ),
+      bottomNavigationBar: NavigationBar(
+        height: 50,
+        backgroundColor: Colors.green[100],
+        surfaceTintColor: Colors.red,
+        destinations: const [
+          NavigationDestination(
+              icon: Icon(Icons.refresh, color: Colors.blue), label: 'Refresh'),
+          NavigationDestination(
+              icon: Icon(Icons.view_array, color: Colors.blue),
+              label: 'Visited'),
+          NavigationDestination(
+              icon: Icon(Icons.label_important, color: Colors.green),
+              label: 'Important'),
+          NavigationDestination(
+              icon: Icon(Icons.delete, color: Colors.red), label: 'Delete'),
+        ],
+        onDestinationSelected: (int index) async {
+          var url;
+          if (index == 0) {
+            getsetOfImages();
+          }
+          if (index == 1) {
             setState(() {
-              currentPageSelected = index;
+              AppValues.fileId = selectedImageId;
+              url = Uri.parse(AppValues.getMarkAsVisitedUrl());
+              debugPrint("URL $url");
             });
-          },
-          selectedIndex: currentPageSelected,
-        ),
-        body: ListWheelScrollView.useDelegate(
-          itemExtent: 250,
-          //magnification: 2,
-          physics: const FixedExtentScrollPhysics(),
-          perspective: 0.001,
-          diameterRatio: 1.5,
-          onSelectedItemChanged: (index) {
-            var currentSelectedItem = response[index];
-            selectedImageId = currentSelectedItem["id"];
-            AppValues.index = selectedImageId;
-            debugPrint(
-                "Current selected image index ${currentSelectedItem["id"]}");
-            getFileInfoAndUpdateStatus();
-          },
 
-          controller: controller,
-          squeeze: 1.1,
-          //offAxisFraction: 1.5,
-          childDelegate: ListWheelChildBuilderDelegate(
-              childCount: imgList.length,
-              builder: (context, index) => imgList[index]),
-        ));
+            await http.get(url);
+          }
+          if (index == 2) {
+            setState(() {
+              AppValues.fileId = selectedImageId;
+              url = Uri.parse(AppValues.getMarkImportantUrl());
+              debugPrint("URL $url");
+            });
+
+            await http.get(url);
+          }
+          if (index == 3) {
+            setState(() {
+              AppValues.fileId = selectedImageId;
+              url = Uri.parse(AppValues.getMarkAsRemoveUrll());
+              debugPrint("URL $url");
+            });
+            await http.get(url);
+          }
+          setState(() {
+            currentPageSelected = index;
+          });
+        },
+        selectedIndex: currentPageSelected,
+      ),
+      body: ListView.builder(
+        itemBuilder: (BuildContext ctx, int index) {
+          return Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: <Widget>[
+                GestureDetector(
+                  onTap: () {
+                    debugPrint("Current Image id ${response[index]["id"]}");
+                    var currentSelectedItem = response[index];
+                    selectedImageId = currentSelectedItem["id"];
+                    AppValues.fileId = selectedImageId;
+                    debugPrint(
+                        "Current selected image index ${currentSelectedItem["id"]}");
+                    getFileInfoAndUpdateStatus();
+                  },
+                  child: imgList[index],
+                )
+
+                // Icon(
+                //   Icons.favorite,
+                //   color: Colors.red,
+                //   size: 50,
+                // ),
+              ],
+            ),
+          );
+        },
+        itemCount: imgList.length,
+      ),
+    );
   }
 }
