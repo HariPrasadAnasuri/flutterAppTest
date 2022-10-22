@@ -73,8 +73,7 @@ class _ManagePhotosState extends State<ManagePhotos> {
         surfaceTintColor: Colors.red,
         destinations: const [
           NavigationDestination(
-              icon: Icon(Icons.arrow_back_ios_sharp, color: Colors.blue),
-              label: 'Prev'),
+              icon: Icon(Icons.face, color: Colors.blue), label: 'Dummy'),
           NavigationDestination(
               icon: Icon(Icons.view_array, color: Colors.blue),
               label: 'Visited'),
@@ -83,22 +82,22 @@ class _ManagePhotosState extends State<ManagePhotos> {
               label: 'Important'),
           NavigationDestination(
               icon: Icon(Icons.delete, color: Colors.red), label: 'Delete'),
-          NavigationDestination(
-              icon: Icon(Icons.arrow_forward_ios_sharp, color: Colors.blue),
-              label: 'Next'),
+          // NavigationDestination(
+          //     icon: Icon(Icons.arrow_forward_ios_sharp, color: Colors.blue),
+          //     label: 'Next'),
         ],
         onDestinationSelected: (int index) async {
           var url;
           if (index == 0) {
-            setState(() {
-              AppValues.index = --AppValues.index;
-              AppValues.imagesUrl = '${constants.photoUrl}${AppValues.index}';
-              debugPrint("AppValues.imagesUrl ${AppValues.imagesUrl}");
-              pinchZoomImage = PinchZoomImage();
-              debugPrint("Index value: ${AppValues.index}");
-              //storage.setItem('lastIndex', AppValues.index);
-              getFileInfoAndUpdateStatus();
-            });
+            // setState(() {
+            //   AppValues.index = --AppValues.index;
+            //   AppValues.imagesUrl = '${constants.photoUrl}${AppValues.index}';
+            //   debugPrint("AppValues.imagesUrl ${AppValues.imagesUrl}");
+            //   pinchZoomImage = PinchZoomImage();
+            //   debugPrint("Index value: ${AppValues.index}");
+            //   //storage.setItem('lastIndex', AppValues.index);
+            //   getFileInfoAndUpdateStatus();
+            // });
           }
           if (index == 1) {
             setState(() {
@@ -123,22 +122,22 @@ class _ManagePhotosState extends State<ManagePhotos> {
             });
             await http.get(url);
           }
-          if (index == 1 || index == 2 || index == 3) {
-            var toUpdateIndexUrl = Uri.parse(AppValues.getSetCurrentIndexUrl());
-            debugPrint("toUpdateIndexUrl $toUpdateIndexUrl");
-            await http.get(toUpdateIndexUrl);
-          }
-          if (index == 4) {
-            setState(() {
-              AppValues.index = ++AppValues.index;
-              AppValues.imagesUrl = '${constants.photoUrl}${AppValues.index}';
-              debugPrint("AppValues.imagesUrl ${AppValues.imagesUrl}");
-              pinchZoomImage = PinchZoomImage();
-              debugPrint("Index value: ${AppValues.index}");
-              //storage.setItem('lastIndex', AppValues.index);
-              getFileInfoAndUpdateStatus();
-            });
-          }
+          // if (index == 1 || index == 2 || index == 3) {
+          //   var toUpdateIndexUrl = Uri.parse(AppValues.getSetCurrentIndexUrl());
+          //   debugPrint("toUpdateIndexUrl $toUpdateIndexUrl");
+          //   await http.get(toUpdateIndexUrl);
+          // }
+          // if (index == 4) {
+          //   setState(() {
+          //     AppValues.index = ++AppValues.index;
+          //     AppValues.imagesUrl = '${constants.photoUrl}${AppValues.index}';
+          //     debugPrint("AppValues.imagesUrl ${AppValues.imagesUrl}");
+          //     pinchZoomImage = PinchZoomImage();
+          //     debugPrint("Index value: ${AppValues.index}");
+          //     //storage.setItem('lastIndex', AppValues.index);
+          //     getFileInfoAndUpdateStatus();
+          //   });
+          // }
           setState(() {
             currentPageSelected = index;
           });

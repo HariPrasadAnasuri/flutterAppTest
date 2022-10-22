@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/alexa_voice_says.dart';
 import 'package:flutter_application_1/harsha_task.dart';
 import 'package:flutter_application_1/learn_flutter_page.dart';
+import 'package:flutter_application_1/list_photos.dart';
 import 'package:flutter_application_1/manage_photos.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:http/http.dart' as http;
@@ -15,8 +16,11 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+List<String> list = <String>['Hari', 'Jyothi'];
+
 class _HomePageState extends State<HomePage> {
   String textEntered = "";
+  late String dropdownValue = list.first;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,13 +82,7 @@ class _HomePageState extends State<HomePage> {
           ),
           onPressed: () async {
             if (textEntered.isNotEmpty) {
-              AppValues.myName = textEntered;
-              var url = Uri.parse(AppValues.getCurrentIndexUrl());
-              var result = await http.get(url);
-              var response = jsonDecode(result.body);
-              AppValues.index = response["fileIndex"];
-              debugPrint("Index retrieved from API: ${AppValues.index}");
-
+              AppValues.myName = dropdownValue;
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (BuildContext buildContext) {
@@ -98,14 +96,51 @@ class _HomePageState extends State<HomePage> {
           },
           child: const Text('Manage photos'),
         ),
-        TextField(
-          onChanged: (value) async {
-            textEntered = value;
-          },
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            hintText: 'Your name',
+        DropdownButton<String>(
+          value: dropdownValue,
+          icon: const Icon(Icons.arrow_downward),
+          elevation: 16,
+          style: const TextStyle(color: Colors.deepPurple),
+          underline: Container(
+            height: 2,
+            color: Colors.deepPurpleAccent,
           ),
+          onChanged: (String? value) {
+            // This is called when the user selects an item.
+            setState(() {
+              dropdownValue = value!;
+              debugPrint("sayEntered: $dropdownValue");
+              AppValues.myName = dropdownValue;
+            });
+          },
+          items: list.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.cyan,
+            minimumSize: const Size.fromHeight(50),
+          ),
+          onPressed: () async {
+            if (dropdownValue.isNotEmpty) {
+              AppValues.myName = dropdownValue;
+              debugPrint("Going for list photos");
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext buildContext) {
+                    return const ListPhotos();
+                  },
+                ),
+              );
+            } else {
+              debugPrint("Please enter the name");
+            }
+          },
+          child: const Text('List photos'),
         ),
       ])),
     ));

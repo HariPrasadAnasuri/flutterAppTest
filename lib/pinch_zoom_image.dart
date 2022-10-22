@@ -54,7 +54,7 @@ class _PinchZoomImageState extends State<PinchZoomImage>
           maxScale: 4.0,
           boundaryMargin: const EdgeInsets.all(double.infinity),
           clipBehavior: Clip.none,
-          child: Image.network(fit: BoxFit.cover, AppValues.imagesUrl),
+          child: Image.network(fit: BoxFit.cover, AppValues.getImageUrl()),
         );
       }),
     );
