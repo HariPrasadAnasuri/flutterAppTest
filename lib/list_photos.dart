@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/shared_values.dart';
@@ -17,13 +18,16 @@ int currentPageSelected = 0;
 
 class _ListPhotosState extends State<ListPhotos> {
   List imgList = [];
+  List highlightColors = [];
   var response;
   late int selectedImageId;
   late FixedExtentScrollController controller;
   late String lastDateSelected;
+  String selectedListItemColor = "red";
 
   void getsetOfImages() async {
     imgList = [];
+
     debugPrint("Inside getsetOfImages()");
     var url = Uri.parse(AppValues.getNextSetOfImagesInfo());
     debugPrint("url $url");
@@ -33,10 +37,17 @@ class _ListPhotosState extends State<ListPhotos> {
     for (var i = 0; i < response.length; i++) {
       var imageId = response[i]["id"];
       var urlForImage = AppValues.getImageShrunkUrlUsingIndex(imageId);
-      var networkImage = Image.network(fit: BoxFit.cover, urlForImage);
+      var networkImage = ClipRRect(
+        borderRadius: BorderRadius.circular(8.0),
+        child: Image.network(
+          fit: BoxFit.cover,
+          urlForImage,
+        ),
+      );
 
       debugPrint("urlForImage $urlForImage");
       setState(() {
+        highlightColors.add(Colors.blue);
         imgList.add(networkImage);
       });
     }
@@ -165,10 +176,40 @@ class _ListPhotosState extends State<ListPhotos> {
                     debugPrint(
                         "Current selected image index ${currentSelectedItem["id"]}");
                     getFileInfoAndUpdateStatus();
+                    String createdDate = currentSelectedItem["createdDate"];
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(createdDate),
+                        duration: const Duration(milliseconds: 1000),
+                      ),
+                    );
+                    setState(() {
+                      highlightColors[index] = Colors.green;
+                      for (var i = 0; i < highlightColors.length; i++) {
+                        if (i != index) {
+                          highlightColors[i] = Colors.blue;
+                        }
+                      }
+                    });
                   },
-                  child: imgList[index],
+                  child: Container(
+                    child: imgList[index],
+                    decoration: BoxDecoration(
+                      border:
+                          Border.all(color: highlightColors[index], width: 6),
+                      borderRadius: BorderRadius.circular(15),
+                      // gradient: const LinearGradient(
+                      //     begin: Alignment.topRight,
+                      //     end: Alignment.bottomLeft,
+                      //     colors: [
+                      //       Colors.blue,
+                      //       Colors.red,
+                      //     ]),
+                      color: Colors.green,
+                      backgroundBlendMode: BlendMode.color,
+                    ),
+                  ),
                 )
-
                 // Icon(
                 //   Icons.favorite,
                 //   color: Colors.red,
