@@ -19,36 +19,31 @@ int currentPageSelected = 0;
 class _ListPhotosState extends State<ListPhotos> {
   List imgList = [];
   List highlightColors = [];
-  var response;
+  List iconOverImages = [];
+  late int currentListIndexSelected;
+  var listOfImagesInfo;
   late int selectedImageId;
   late FixedExtentScrollController controller;
   late String lastDateSelected;
   String selectedListItemColor = "red";
+  IconData testIcon = Icons.favorite;
 
   void getsetOfImages() async {
     imgList = [];
-
+    highlightColors = [];
     debugPrint("Inside getsetOfImages()");
     var url = Uri.parse(AppValues.getNextSetOfImagesInfo());
     debugPrint("url $url");
     var result = await http.get(url);
-    response = jsonDecode(result.body);
-    debugPrint("response $response");
-    for (var i = 0; i < response.length; i++) {
-      var imageId = response[i]["id"];
+    listOfImagesInfo = jsonDecode(result.body);
+    //debugPrint("response $response");
+    for (var i = 0; i < listOfImagesInfo.length; i++) {
+      var imageId = listOfImagesInfo[i]["id"];
       var urlForImage = AppValues.getImageShrunkUrlUsingIndex(imageId);
-      var networkImage = ClipRRect(
-        borderRadius: BorderRadius.circular(8.0),
-        child: Image.network(
-          fit: BoxFit.cover,
-          urlForImage,
-        ),
-      );
-
+      Positioned overImageIcon;
       debugPrint("urlForImage $urlForImage");
       setState(() {
         highlightColors.add(Colors.blue);
-        imgList.add(networkImage);
       });
     }
   }
@@ -92,6 +87,7 @@ class _ListPhotosState extends State<ListPhotos> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey,
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.arrow_forward),
         onPressed: () {
@@ -131,29 +127,38 @@ class _ListPhotosState extends State<ListPhotos> {
           }
           if (index == 1) {
             setState(() {
+              listOfImagesInfo[currentListIndexSelected]["visited"] = true;
+              listOfImagesInfo[currentListIndexSelected]["tobeDeleted"] = false;
+              listOfImagesInfo[currentListIndexSelected]["important"] = false;
               AppValues.fileId = selectedImageId;
               url = Uri.parse(AppValues.getMarkAsVisitedUrl());
               debugPrint("URL $url");
             });
 
-            await http.get(url);
+            //await http.get(url);
           }
           if (index == 2) {
             setState(() {
+              listOfImagesInfo[currentListIndexSelected]["important"] = true;
+              listOfImagesInfo[currentListIndexSelected]["visited"] = false;
+              listOfImagesInfo[currentListIndexSelected]["tobeDeleted"] = false;
               AppValues.fileId = selectedImageId;
               url = Uri.parse(AppValues.getMarkImportantUrl());
               debugPrint("URL $url");
             });
 
-            await http.get(url);
+            //await http.get(url);
           }
           if (index == 3) {
             setState(() {
+              listOfImagesInfo[currentListIndexSelected]["tobeDeleted"] = true;
+              listOfImagesInfo[currentListIndexSelected]["important"] = false;
+              listOfImagesInfo[currentListIndexSelected]["visited"] = false;
               AppValues.fileId = selectedImageId;
               url = Uri.parse(AppValues.getMarkAsRemoveUrll());
               debugPrint("URL $url");
             });
-            await http.get(url);
+            //await http.get(url);
           }
           setState(() {
             currentPageSelected = index;
@@ -164,13 +169,13 @@ class _ListPhotosState extends State<ListPhotos> {
       body: ListView.builder(
         itemBuilder: (BuildContext ctx, int index) {
           return Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(3),
             child: Column(
               children: <Widget>[
                 GestureDetector(
                   onTap: () {
-                    debugPrint("Current Image id ${response[index]["id"]}");
-                    var currentSelectedItem = response[index];
+                    debugPrint("Current Image id ${listOfImagesInfo[index]["id"]}");
+                    var currentSelectedItem = listOfImagesInfo[index];
                     selectedImageId = currentSelectedItem["id"];
                     AppValues.fileId = selectedImageId;
                     debugPrint(
@@ -184,6 +189,7 @@ class _ListPhotosState extends State<ListPhotos> {
                       ),
                     );
                     setState(() {
+                      currentListIndexSelected = index;
                       highlightColors[index] = Colors.green;
                       for (var i = 0; i < highlightColors.length; i++) {
                         if (i != index) {
@@ -193,7 +199,6 @@ class _ListPhotosState extends State<ListPhotos> {
                     });
                   },
                   child: Container(
-                    child: imgList[index],
                     decoration: BoxDecoration(
                       border:
                           Border.all(color: highlightColors[index], width: 6),
@@ -208,6 +213,39 @@ class _ListPhotosState extends State<ListPhotos> {
                       color: Colors.green,
                       backgroundBlendMode: BlendMode.color,
                     ),
+                    child: Stack(
+                      children: <Widget>[
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: Image.network(
+                            fit: BoxFit.cover,
+                            AppValues.getImageShrunkUrlUsingIndex(
+                                listOfImagesInfo[index]["id"].toString()),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 15,
+                          left: 15,
+                          //give the values according to your requirement
+                          child: Icon(
+                            listOfImagesInfo[index]["important"]
+                                ? Icons.favorite
+                                : listOfImagesInfo[index]["visited"]
+                                    ? Icons.view_array
+                                    : listOfImagesInfo[index]["tobeDeleted"]
+                                        ? Icons.delete
+                                        : Icons.pending,
+                            color: listOfImagesInfo[index]["important"]
+                                ? Colors.green
+                                : listOfImagesInfo[index]["visited"]
+                                    ? Colors.blue
+                                    : listOfImagesInfo[index]["tobeDeleted"]
+                                        ? Colors.red
+                                        : Colors.yellow,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 )
                 // Icon(
@@ -219,7 +257,7 @@ class _ListPhotosState extends State<ListPhotos> {
             ),
           );
         },
-        itemCount: imgList.length,
+        itemCount: listOfImagesInfo.length,
       ),
     );
   }

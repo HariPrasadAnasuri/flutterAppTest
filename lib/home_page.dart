@@ -25,124 +25,135 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SingleChildScrollView(
-      child: Center(
-          child: Column(children: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-            minimumSize: const Size.fromHeight(50),
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        // decoration: BoxDecoration(
+        //   border: Border.all(),
+        // ),
+        child: Column(children: [
+          DropdownButton<String>(
+            autofocus: true,
+            value: dropdownValue,
+            icon: const Icon(Icons.arrow_downward),
+            elevation: 16,
+            style: const TextStyle(color: Colors.deepPurple),
+            underline: Container(
+              height: 2,
+              color: Colors.deepPurpleAccent,
+            ),
+            onChanged: (String? value) {
+              // This is called when the user selects an item.
+              setState(() {
+                dropdownValue = value!;
+                debugPrint("sayEntered: $dropdownValue");
+                AppValues.userName = dropdownValue;
+              });
+            },
+            items: list.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext buildContext) {
-                  return const LearnFlutterPage();
-                },
-              ),
-            );
-          },
-          child: const Text('Learn Flutter'),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            minimumSize: const Size.fromHeight(50),
-          ),
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext buildContext) {
-                  return const HarshaTask();
-                },
-              ),
-            );
-          },
-          child: const Text('Create harsha task'),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.yellow,
-            minimumSize: const Size.fromHeight(50),
-          ),
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (BuildContext buildContext) {
-                  return const AlexaVoiceSays();
-                },
-              ),
-            );
-          },
-          child: const Text('Alexa voices'),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.cyan,
-            minimumSize: const Size.fromHeight(50),
-          ),
-          onPressed: () async {
-            if (textEntered.isNotEmpty) {
-              AppValues.userName = dropdownValue;
+          const SizedBox(height: 12),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              minimumSize: const Size.fromHeight(50),
+            ),
+            onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (BuildContext buildContext) {
-                    return const ManagePhotos();
+                    return const LearnFlutterPage();
                   },
                 ),
               );
-            } else {
-              debugPrint("Please enter the name");
-            }
-          },
-          child: const Text('Manage photos'),
-        ),
-        DropdownButton<String>(
-          value: dropdownValue,
-          icon: const Icon(Icons.arrow_downward),
-          elevation: 16,
-          style: const TextStyle(color: Colors.deepPurple),
-          underline: Container(
-            height: 2,
-            color: Colors.deepPurpleAccent,
+            },
+            child: const Text('Learn Flutter'),
           ),
-          onChanged: (String? value) {
-            // This is called when the user selects an item.
-            setState(() {
-              dropdownValue = value!;
-              debugPrint("sayEntered: $dropdownValue");
-              AppValues.userName = dropdownValue;
-            });
-          },
-          items: list.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.cyan,
-            minimumSize: const Size.fromHeight(50),
-          ),
-          onPressed: () async {
-            if (dropdownValue.isNotEmpty) {
-              AppValues.userName = dropdownValue;
-              debugPrint("Going for list photos");
+          const SizedBox(height: 12),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              minimumSize: const Size.fromHeight(50),
+            ),
+            onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (BuildContext buildContext) {
-                    return const ListPhotos();
+                    return const HarshaTask();
                   },
                 ),
               );
-            } else {
-              debugPrint("Please enter the name");
-            }
-          },
-          child: const Text('List photos'),
-        ),
-      ])),
+            },
+            child: const Text('Create harsha task'),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.yellow,
+              minimumSize: const Size.fromHeight(50),
+            ),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext buildContext) {
+                    return const AlexaVoiceSays();
+                  },
+                ),
+              );
+            },
+            child: const Text('Alexa voices'),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.cyan,
+              minimumSize: const Size.fromHeight(50),
+            ),
+            onPressed: () async {
+              if (textEntered.isNotEmpty) {
+                AppValues.userName = dropdownValue;
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext buildContext) {
+                      return const ManagePhotos();
+                    },
+                  ),
+                );
+              } else {
+                debugPrint("Please enter the name");
+              }
+            },
+            child: const Text('Manage photos'),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.cyan,
+              minimumSize: const Size.fromHeight(50),
+            ),
+            onPressed: () async {
+              if (dropdownValue.isNotEmpty) {
+                AppValues.userName = dropdownValue;
+                debugPrint("Going for list photos");
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext buildContext) {
+                      return const ListPhotos();
+                    },
+                  ),
+                );
+              } else {
+                debugPrint("Please enter the name");
+              }
+            },
+            child: const Text('List photos'),
+          ),
+        ]),
+      ),
     ));
   }
 }

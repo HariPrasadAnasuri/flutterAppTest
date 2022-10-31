@@ -34,7 +34,20 @@ class _RootPageState extends State<RootPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hari App'),
+        title: const Text('Johar family'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 239, 109, 27),
+                  Color(0xFF00CCFF),
+                ],
+                begin: FractionalOffset(0.0, 0.0),
+                end: FractionalOffset(1.0, 0.0),
+                stops: [0.0, 1.0],
+                tileMode: TileMode.clamp),
+          ),
+        ),
       ),
       body: pages[currentPage],
       floatingActionButton: FloatingActionButton(
