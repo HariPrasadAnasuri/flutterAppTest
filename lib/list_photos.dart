@@ -14,23 +14,53 @@ class ListPhotos extends StatefulWidget {
   State<ListPhotos> createState() => _ListPhotosState();
 }
 
-int currentPageSelected = 0;
+int optionSelected = 0;
 
+class RadiantGradientMask extends StatelessWidget {
+  const RadiantGradientMask({super.key, required this.child, required this.start, required this.end});
+  final Widget child;
+  final Color start;
+  final Color end;
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      shaderCallback: (bounds) => RadialGradient(
+        center: Alignment.bottomLeft,
+        radius: 0.5,
+        colors: [start, end],
+        tileMode: TileMode.repeated,
+      ).createShader(bounds),
+      child: child,
+    );
+  }
+}
 class _ListPhotosState extends State<ListPhotos> {
   List imgList = [];
   List highlightColors = [];
-  List iconOverImages = [];
   late int currentListIndexSelected;
-  var listOfImagesInfo;
+  List listOfImagesInfo = [];
   late int selectedImageId;
   late FixedExtentScrollController controller;
   late String lastDateSelected;
   String selectedListItemColor = "red";
   IconData testIcon = Icons.favorite;
+  int _currentMax = 10;
 
-  void getsetOfImages() async {
-    imgList = [];
-    highlightColors = [];
+  _getMoreData() {
+    for (int i = _currentMax; i < _currentMax + 10; i++) {
+      listOfImagesInfo.add("Item : ${i + 1}");
+    }
+
+    _currentMax = _currentMax + 10;
+
+    setState(() {});
+  }
+
+  Future<List> getsetOfImages() async {
+    imgList.clear();
+    highlightColors.clear();
+    highlightColors.add(Colors.blue);
     debugPrint("Inside getsetOfImages()");
     var url = Uri.parse(AppValues.getNextSetOfImagesInfo());
     debugPrint("url $url");
@@ -38,35 +68,25 @@ class _ListPhotosState extends State<ListPhotos> {
     listOfImagesInfo = jsonDecode(result.body);
     //debugPrint("response $response");
     for (var i = 0; i < listOfImagesInfo.length; i++) {
-      var imageId = listOfImagesInfo[i]["id"];
-      var urlForImage = AppValues.getImageShrunkUrlUsingIndex(imageId);
-      Positioned overImageIcon;
-      debugPrint("urlForImage $urlForImage");
       setState(() {
         highlightColors.add(Colors.blue);
       });
     }
+    return listOfImagesInfo;
   }
 
-  void getFileInfoAndUpdateStatus() async {
-    String testUrl = '${AppValues.host}/photos/${AppValues.fileId}/fileInfo';
-    var url = Uri.parse(testUrl);
-    debugPrint("Url to get the file info $url");
-    var result = await http.get(url);
+  void getFileInfoAndUpdateStatus(currentSelectedItem) async {
     setState(() {
-      var response = jsonDecode(result.body);
       int selectedState = 0;
-      if (response['tobeDeleted'] != null && response['tobeDeleted']) {
+      if (currentSelectedItem['tobeDeleted'] != null && currentSelectedItem['tobeDeleted']) {
+        selectedState = 4;
+      } else if (currentSelectedItem['important'] != null && currentSelectedItem['important']) {
         selectedState = 3;
-      } else if (response['important'] != null && response['important']) {
+      } else if (currentSelectedItem['visited'] != null && currentSelectedItem['visited']) {
         selectedState = 2;
-      } else if (response['visited'] != null && response['visited']) {
-        selectedState = 1;
       }
-
-      currentPageSelected = selectedState;
-      debugPrint("currentPageSelected: $currentPageSelected");
-      debugPrint("result.body: ${result.body}");
+      optionSelected = selectedState;
+      debugPrint("optionSelected: $optionSelected");
     });
   }
 
@@ -110,6 +130,8 @@ class _ListPhotosState extends State<ListPhotos> {
         surfaceTintColor: Colors.red,
         destinations: const [
           NavigationDestination(
+              icon: Icon(Icons.face, color: Colors.blue), label: 'Dummy'),
+          NavigationDestination(
               icon: Icon(Icons.refresh, color: Colors.blue), label: 'Refresh'),
           NavigationDestination(
               icon: Icon(Icons.view_array, color: Colors.blue),
@@ -123,9 +145,12 @@ class _ListPhotosState extends State<ListPhotos> {
         onDestinationSelected: (int index) async {
           var url;
           if (index == 0) {
-            getsetOfImages();
+
           }
           if (index == 1) {
+            getsetOfImages();
+          }
+          if (index == 2) {
             setState(() {
               listOfImagesInfo[currentListIndexSelected]["visited"] = true;
               listOfImagesInfo[currentListIndexSelected]["tobeDeleted"] = false;
@@ -135,9 +160,9 @@ class _ListPhotosState extends State<ListPhotos> {
               debugPrint("URL $url");
             });
 
-            //await http.get(url);
+            await http.get(url);
           }
-          if (index == 2) {
+          if (index == 3) {
             setState(() {
               listOfImagesInfo[currentListIndexSelected]["important"] = true;
               listOfImagesInfo[currentListIndexSelected]["visited"] = false;
@@ -147,9 +172,9 @@ class _ListPhotosState extends State<ListPhotos> {
               debugPrint("URL $url");
             });
 
-            //await http.get(url);
+            await http.get(url);
           }
-          if (index == 3) {
+          if (index == 4) {
             setState(() {
               listOfImagesInfo[currentListIndexSelected]["tobeDeleted"] = true;
               listOfImagesInfo[currentListIndexSelected]["important"] = false;
@@ -158,104 +183,123 @@ class _ListPhotosState extends State<ListPhotos> {
               url = Uri.parse(AppValues.getMarkAsRemoveUrll());
               debugPrint("URL $url");
             });
-            //await http.get(url);
+            await http.get(url);
           }
           setState(() {
-            currentPageSelected = index;
+            optionSelected = index;
           });
         },
-        selectedIndex: currentPageSelected,
+        selectedIndex: optionSelected,
       ),
       body: ListView.builder(
         itemBuilder: (BuildContext ctx, int index) {
-          return Padding(
-            padding: const EdgeInsets.all(3),
-            child: Column(
-              children: <Widget>[
-                GestureDetector(
-                  onTap: () {
-                    debugPrint("Current Image id ${listOfImagesInfo[index]["id"]}");
-                    var currentSelectedItem = listOfImagesInfo[index];
-                    selectedImageId = currentSelectedItem["id"];
-                    AppValues.fileId = selectedImageId;
-                    debugPrint(
-                        "Current selected image index ${currentSelectedItem["id"]}");
-                    getFileInfoAndUpdateStatus();
-                    String createdDate = currentSelectedItem["createdDate"];
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(createdDate),
-                        duration: const Duration(milliseconds: 1000),
-                      ),
-                    );
-                    setState(() {
-                      currentListIndexSelected = index;
-                      highlightColors[index] = Colors.green;
-                      for (var i = 0; i < highlightColors.length; i++) {
-                        if (i != index) {
-                          highlightColors[i] = Colors.blue;
-                        }
-                      }
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border:
+          if(highlightColors.length > 5){
+            return
+              Padding(
+                padding: const EdgeInsets.all(3),
+                child: Column(
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        debugPrint("Current Image id ${listOfImagesInfo[index]["id"]}");
+                        var currentSelectedItem = listOfImagesInfo[index];
+                        selectedImageId = currentSelectedItem["id"];
+                        AppValues.fileId = selectedImageId;
+                        debugPrint(
+                            "Current selected image index ${currentSelectedItem["id"]}");
+                        getFileInfoAndUpdateStatus(currentSelectedItem);
+                        String createdDate = currentSelectedItem["createdDate"];
+                        String fileLocation = currentSelectedItem["filePath"];
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("$createdDate\n$fileLocation"),
+                            duration: const Duration(milliseconds: 1500),
+                          ),
+                        );
+                        setState(() {
+                          currentListIndexSelected = index;
+                          highlightColors[index] = Colors.green;
+                          for (var i = 0; i < highlightColors.length; i++) {
+                            if (i != index) {
+                              highlightColors[i] = Colors.blue;
+                            }
+                          }
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          border:
                           Border.all(color: highlightColors[index], width: 6),
-                      borderRadius: BorderRadius.circular(15),
-                      // gradient: const LinearGradient(
-                      //     begin: Alignment.topRight,
-                      //     end: Alignment.bottomLeft,
-                      //     colors: [
-                      //       Colors.blue,
-                      //       Colors.red,
-                      //     ]),
-                      color: Colors.green,
-                      backgroundBlendMode: BlendMode.color,
-                    ),
-                    child: Stack(
-                      children: <Widget>[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: Image.network(
-                            fit: BoxFit.cover,
-                            AppValues.getImageShrunkUrlUsingIndex(
-                                listOfImagesInfo[index]["id"].toString()),
-                          ),
+                          borderRadius: BorderRadius.circular(15),
+                          // gradient: const LinearGradient(
+                          //     begin: Alignment.topRight,
+                          //     end: Alignment.bottomLeft,
+                          //     colors: [
+                          //       Colors.blue,
+                          //       Colors.red,
+                          //     ]),
+                          color: Colors.green,
+                          backgroundBlendMode: BlendMode.color,
                         ),
-                        Positioned(
-                          bottom: 15,
-                          left: 15,
-                          //give the values according to your requirement
-                          child: Icon(
-                            listOfImagesInfo[index]["important"]
-                                ? Icons.favorite
-                                : listOfImagesInfo[index]["visited"]
-                                    ? Icons.view_array
+                        child: Stack(
+                          children: <Widget>[
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8.0),
+                              child: Image.network(
+                                fit: BoxFit.cover,
+                                AppValues.getImageShrunkUrlUsingIndex(
+                                    listOfImagesInfo[index]["id"].toString()),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 15,
+                              left: 15,
+                              //give the values according to your requirement
+                              
+                              child: RadiantGradientMask(
+                                start: listOfImagesInfo[index]["important"]
+                                    ? Colors.lightGreenAccent
+                                    : listOfImagesInfo[index]["visited"]
+                                    ? Colors.lightBlue
                                     : listOfImagesInfo[index]["tobeDeleted"]
-                                        ? Icons.delete
-                                        : Icons.pending,
-                            color: listOfImagesInfo[index]["important"]
-                                ? Colors.green
-                                : listOfImagesInfo[index]["visited"]
-                                    ? Colors.blue
-                                    : listOfImagesInfo[index]["tobeDeleted"]
-                                        ? Colors.red
-                                        : Colors.yellow,
-                          ),
+                                    ? Colors.redAccent
+                                    : Colors.yellow,
+                                end: Colors.pink,
+                                child: Icon(
+                                  size: 70,
+                                  listOfImagesInfo[index]["important"]
+                                      ? Icons.favorite
+                                      : listOfImagesInfo[index]["visited"]
+                                      ? Icons.view_array
+                                      : listOfImagesInfo[index]["tobeDeleted"]
+                                      ? Icons.delete
+                                      : Icons.pending,
+                                  color: listOfImagesInfo[index]["important"]
+                                      ? Colors.lightGreenAccent
+                                      : listOfImagesInfo[index]["visited"]
+                                      ? Colors.lightBlue
+                                      : listOfImagesInfo[index]["tobeDeleted"]
+                                      ? Colors.redAccent
+                                      : Colors.yellow,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                )
-                // Icon(
-                //   Icons.favorite,
-                //   color: Colors.red,
-                //   size: 50,
-                // ),
-              ],
-            ),
-          );
+                      ),
+                    )
+                    // Icon(
+                    //   Icons.favorite,
+                    //   color: Colors.red,
+                    //   size: 50,
+                    // ),
+                  ],
+                ),
+              );
+          }else{
+            return const CircularProgressIndicator();
+          }
+
         },
         itemCount: listOfImagesInfo.length,
       ),

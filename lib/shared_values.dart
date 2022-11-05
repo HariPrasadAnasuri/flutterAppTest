@@ -1,8 +1,14 @@
 class AppValues {
   static int fileId = 0;
   static String createdDate = "2015-08-11 22:26:34";
-  static String host = 'http://[2405:201:c018:4016:b24a:eaf9:f5d2:b35]:7000';
-  //static String host = 'http://[2405:201:c018:4016:7e67:1e67:4cc5:d0fd]:7000';
+
+  // LENOVO
+  static String host = 'http://[2405:201:c018:4016:ccf9:19b1:49dc:b1f4]:7000';
+
+  // static String host = 'http://[2405:201:c018:4016:7e67:1e67:4cc5:d0fd]:7000';
+
+  // ASUS
+  // static String host = 'http://[2405:201:c018:4016:b24a:eaf9:f5d2:b35]:7000';
 
   // static String host = 'http://192.168.29.49:7000';
   static String imagesUrl = '$host/photos/$fileId';
@@ -54,6 +60,6 @@ class AppValues {
   }
 
   static String getImageShrunkUrlUsingIndex(imageId) {
-    return '$host/photos/$imageId/shrink';
+    return '$host/photos/$imageId/shrink?userName=$userName';
   }
 }
