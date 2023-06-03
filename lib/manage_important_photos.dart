@@ -28,21 +28,22 @@ class _ManageImportantPhotosState extends State<ManageImportantPhotos> {
   late String noteEntered;
   late String panDirection;
   void getFileInfoAndUpdateStatus() async {
-    String testUrl = '${AppValues.url}/photos/${AppValues.fileId}/fileInfo';
+    String testUrl = '${AppValues.host}/photos/${AppValues.fileId}/fileInfo';
     var url = Uri.parse(testUrl);
     debugPrint("Url to get the file info $url");
     var result = await http.get(url);
     setState(() {
       var response = jsonDecode(result.body);
       int selectedState = 0;
-      if (response['tobeDeleted'] != null && response['tobeDeleted']) {
-        selectedState = 3;
-      } else if (response['important'] != null && response['important']) {
-        selectedState = 2;
-      } else if (response['visited'] != null && response['visited']) {
-        selectedState = 1;
+      if (response['printStatus'] != null && response['printStatus']) {
+        if(response['printStatus'] == "INITIAL"){
+          selectedState = 1;
+        }else if(response['printStatus'] == "SELECTED"){
+          selectedState = 2;
+        }else if(response['printStatus'] == "PRINTED"){
+          selectedState = 3;
+        }
       }
-
       currentPageSelected = selectedState;
       debugPrint("currentPageSelected: $currentPageSelected");
       debugPrint("result.body: ${result.body}");
@@ -76,12 +77,12 @@ class _ManageImportantPhotosState extends State<ManageImportantPhotos> {
               icon: Icon(Icons.face, color: Colors.blue), label: 'Dummy'),
           NavigationDestination(
               icon: Icon(Icons.view_array, color: Colors.blue),
-              label: 'Visited'),
+              label: 'Initial'),
           NavigationDestination(
               icon: Icon(Icons.label_important, color: Colors.green),
-              label: 'Important'),
+              label: 'Selected'),
           NavigationDestination(
-              icon: Icon(Icons.delete, color: Colors.red), label: 'Delete'),
+              icon: Icon(Icons.delete, color: Colors.red), label: 'Printed'),
           // NavigationDestination(
           //     icon: Icon(Icons.arrow_forward_ios_sharp, color: Colors.blue),
           //     label: 'Next'),
@@ -101,43 +102,25 @@ class _ManageImportantPhotosState extends State<ManageImportantPhotos> {
           }
           if (index == 1) {
             setState(() {
-              url = Uri.parse(AppValues.getMarkAsVisitedUrl());
+              url = Uri.parse(AppValues.getUrlToSetThePhotoPrintStatus("INITIAL"));
               debugPrint("URL $url");
             });
-
             await http.get(url);
           }
           if (index == 2) {
             setState(() {
-              url = Uri.parse(AppValues.getMarkImportantUrl());
+              url = Uri.parse(AppValues.getUrlToSetThePhotoPrintStatus("SELECTED"));
               debugPrint("URL $url");
             });
-
             await http.get(url);
           }
           if (index == 3) {
             setState(() {
-              url = Uri.parse(AppValues.getMarkAsRemoveUrll());
+              url = Uri.parse(AppValues.getUrlToSetThePhotoPrintStatus("PRINTED"));
               debugPrint("URL $url");
             });
             await http.get(url);
           }
-          // if (index == 1 || index == 2 || index == 3) {
-          //   var toUpdateIndexUrl = Uri.parse(AppValues.getSetCurrentIndexUrl());
-          //   debugPrint("toUpdateIndexUrl $toUpdateIndexUrl");
-          //   await http.get(toUpdateIndexUrl);
-          // }
-          // if (index == 4) {
-          //   setState(() {
-          //     AppValues.index = ++AppValues.index;
-          //     AppValues.imagesUrl = '${constants.photoUrl}${AppValues.index}';
-          //     debugPrint("AppValues.imagesUrl ${AppValues.imagesUrl}");
-          //     pinchZoomImage = PinchZoomImage();
-          //     debugPrint("Index value: ${AppValues.index}");
-          //     //storage.setItem('lastIndex', AppValues.index);
-          //     getFileInfoAndUpdateStatus();
-          //   });
-          // }
           setState(() {
             currentPageSelected = index;
           });

@@ -28,7 +28,7 @@ class _ManagePhotosState extends State<ManagePhotos> {
   late String noteEntered;
   late String panDirection;
   void getFileInfoAndUpdateStatus() async {
-    String testUrl = '${AppValues.url}/photos/${AppValues.fileId}/fileInfo';
+    String testUrl = '${AppValues.host}/photos/${AppValues.fileId}/fileInfo';
     var url = Uri.parse(testUrl);
     debugPrint("Url to get the file info $url");
     var result = await http.get(url);

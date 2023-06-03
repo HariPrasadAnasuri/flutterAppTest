@@ -62,7 +62,7 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
     highlightColors.clear();
     highlightColors.add(Colors.blue);
     debugPrint("Inside getsetOfImages()");
-    var url = Uri.parse(AppValues.getNextSetOfImagesInfo());
+    var url = Uri.parse(AppValues.getNextSetOfImportantImagesInfo());
     debugPrint("url $url");
     var result = await http.get(url);
     listOfImagesInfo = jsonDecode(result.body);
@@ -78,12 +78,14 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
   void getFileInfoAndUpdateStatus(currentSelectedItem) async {
     setState(() {
       int selectedState = 0;
-      if (currentSelectedItem['tobeDeleted'] != null && currentSelectedItem['tobeDeleted']) {
-        selectedState = 4;
-      } else if (currentSelectedItem['important'] != null && currentSelectedItem['important']) {
-        selectedState = 3;
-      } else if (currentSelectedItem['visited'] != null && currentSelectedItem['visited']) {
-        selectedState = 2;
+      if (currentSelectedItem['printStatus'] != null && currentSelectedItem['printStatus']) {
+        if(currentSelectedItem['printStatus'] == "INITIAL"){
+          selectedState = 1;
+        }else if(currentSelectedItem['printStatus'] == "SELECTED"){
+          selectedState = 2;
+        }else if(currentSelectedItem['printStatus'] == "PRINTED"){
+          selectedState = 3;
+        }
       }
       optionSelected = selectedState;
       debugPrint("optionSelected: $optionSelected");
@@ -134,13 +136,13 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
           NavigationDestination(
               icon: Icon(Icons.refresh, color: Colors.blue), label: 'Refresh'),
           NavigationDestination(
-              icon: Icon(Icons.view_array, color: Colors.blue),
-              label: 'Visited'),
+              icon: Icon(Icons.start, color: Colors.blue),
+              label: 'Initial'),
           NavigationDestination(
-              icon: Icon(Icons.label_important, color: Colors.green),
-              label: 'Important'),
+              icon: Icon(Icons.add, color: Colors.green),
+              label: 'Selected'),
           NavigationDestination(
-              icon: Icon(Icons.delete, color: Colors.red), label: 'Delete'),
+              icon: Icon(Icons.print, color: Colors.red), label: 'Printed'),
         ],
         onDestinationSelected: (int index) async {
           var url;
@@ -152,11 +154,10 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
           }
           if (index == 2) {
             setState(() {
-              listOfImagesInfo[currentListIndexSelected]["visited"] = true;
-              listOfImagesInfo[currentListIndexSelected]["tobeDeleted"] = false;
-              listOfImagesInfo[currentListIndexSelected]["important"] = false;
+              listOfImagesInfo[currentListIndexSelected]["printStatus"] = "INITIAL";
               AppValues.fileId = selectedImageId;
-              url = Uri.parse(AppValues.getMarkAsVisitedUrl());
+
+              url = Uri.parse(AppValues.getUrlToSetThePhotoPrintStatus("INITIAL"));
               debugPrint("URL $url");
             });
 
@@ -164,11 +165,9 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
           }
           if (index == 3) {
             setState(() {
-              listOfImagesInfo[currentListIndexSelected]["important"] = true;
-              listOfImagesInfo[currentListIndexSelected]["visited"] = false;
-              listOfImagesInfo[currentListIndexSelected]["tobeDeleted"] = false;
+              listOfImagesInfo[currentListIndexSelected]["printStatus"] = "SELECTED";
               AppValues.fileId = selectedImageId;
-              url = Uri.parse(AppValues.getMarkImportantUrl());
+              url = Uri.parse(AppValues.getUrlToSetThePhotoPrintStatus("SELECTED"));
               debugPrint("URL $url");
             });
 
@@ -176,11 +175,9 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
           }
           if (index == 4) {
             setState(() {
-              listOfImagesInfo[currentListIndexSelected]["tobeDeleted"] = true;
-              listOfImagesInfo[currentListIndexSelected]["important"] = false;
-              listOfImagesInfo[currentListIndexSelected]["visited"] = false;
+              listOfImagesInfo[currentListIndexSelected]["printStatus"] = "PRINTED";
               AppValues.fileId = selectedImageId;
-              url = Uri.parse(AppValues.getMarkAsRemoveUrll());
+              url = Uri.parse(AppValues.getUrlToSetThePhotoPrintStatus("PRINTED"));
               debugPrint("URL $url");
             });
             await http.get(url);
@@ -247,7 +244,7 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
                               borderRadius: BorderRadius.circular(8.0),
                               child: Image.network(
                                 fit: BoxFit.cover,
-                                AppValues.getImageShrunkUrlUsingIndex(
+                                AppValues.getImageShrunkUrlUsingIdForImportantPhotos(
                                     listOfImagesInfo[index]["id"].toString()),
                               ),
                             ),

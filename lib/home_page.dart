@@ -211,7 +211,7 @@ class _HomePageState extends State<HomePage> {
                 debugPrint("");
               }
             },
-            child: const Text('Selected photos'),
+            child: const Text('Manage videos'),
           ),
           const SizedBox(height: 12),
           ElevatedButton(
