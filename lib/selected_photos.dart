@@ -7,11 +7,11 @@ import 'package:http/http.dart' as http;
 
 import 'manage_photos.dart';
 
-class ListPhotos extends StatefulWidget {
-  const ListPhotos({super.key});
+class SelectedPhotos extends StatefulWidget {
+  const SelectedPhotos({super.key});
 
   @override
-  State<ListPhotos> createState() => _ListPhotosState();
+  State<SelectedPhotos> createState() => _SelectedPhotosState();
 }
 
 int optionSelected = 0;
@@ -35,7 +35,7 @@ class RadiantGradientMask extends StatelessWidget {
     );
   }
 }
-class _ListPhotosState extends State<ListPhotos> {
+class _SelectedPhotosState extends State<SelectedPhotos> {
   List imgList = [];
   List highlightColors = [];
   late int currentListIndexSelected;
@@ -107,23 +107,6 @@ class _ListPhotosState extends State<ListPhotos> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Harsha game'),
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          icon: const Icon(Icons.arrow_back_ios),
-        ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                debugPrint("Actions");
-              },
-              icon: const Icon(Icons.info))
-        ],
-      ),
       backgroundColor: Colors.grey,
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.arrow_forward),
@@ -272,7 +255,7 @@ class _ListPhotosState extends State<ListPhotos> {
                               bottom: 15,
                               left: 15,
                               //give the values according to your requirement
-                              
+
                               child: RadiantGradientMask(
                                 start: listOfImagesInfo[index]["important"]
                                     ? Colors.lightGreenAccent

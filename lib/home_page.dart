@@ -6,7 +6,10 @@ import 'package:flutter_application_1/harsha_task.dart';
 import 'package:flutter_application_1/learn_flutter_page.dart';
 import 'package:flutter_application_1/list_photos.dart';
 import 'package:flutter_application_1/manage_photos.dart';
+import 'package:flutter_application_1/manage_videos.dart';
+import 'package:flutter_application_1/selected_photos.dart';
 import 'package:flutter_application_1/shared_values.dart';
+import 'package:flutter_application_1/show_qr_code_photo.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
@@ -20,6 +23,7 @@ List<String> list = <String>['Hari', 'Jyothi'];
 
 class _HomePageState extends State<HomePage> {
   String textEntered = "";
+  String url  = "";
   late String dropdownValue = list.first;
   @override
   Widget build(BuildContext context) {
@@ -56,7 +60,18 @@ class _HomePageState extends State<HomePage> {
               );
             }).toList(),
           ),
-          const SizedBox(height: 12),
+          TextField(
+            onChanged: (value) {
+              setState(() {
+                AppValues.setSiteUrl(value);
+              });
+            },
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: 'Enter a search term',
+            ),
+          ),
+          /*const SizedBox(height: 12),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,
@@ -72,8 +87,8 @@ class _HomePageState extends State<HomePage> {
               );
             },
             child: const Text('Learn Flutter'),
-          ),
-          const SizedBox(height: 12),
+          ),*/
+          /*const SizedBox(height: 12),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
@@ -89,8 +104,8 @@ class _HomePageState extends State<HomePage> {
               );
             },
             child: const Text('Create harsha task'),
-          ),
-          const SizedBox(height: 12),
+          ),*/
+          /*const SizedBox(height: 12),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.yellow,
@@ -106,15 +121,15 @@ class _HomePageState extends State<HomePage> {
               );
             },
             child: const Text('Alexa voices'),
-          ),
-          const SizedBox(height: 12),
+          ),*/
+          /*const SizedBox(height: 12),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.cyan,
               minimumSize: const Size.fromHeight(50),
             ),
             onPressed: () async {
-              if (textEntered.isNotEmpty) {
+              if (dropdownValue.isNotEmpty) {
                 AppValues.userName = dropdownValue;
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -128,7 +143,7 @@ class _HomePageState extends State<HomePage> {
               }
             },
             child: const Text('Manage photos'),
-          ),
+          ),*/
           const SizedBox(height: 12),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -151,6 +166,75 @@ class _HomePageState extends State<HomePage> {
               }
             },
             child: const Text('List photos'),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              minimumSize: const Size.fromHeight(50),
+            ),
+            onPressed: () async {
+              if (dropdownValue.isNotEmpty) {
+                AppValues.userName = dropdownValue;
+                debugPrint("Going for list photos");
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext buildContext) {
+                      return const SelectedPhotos();
+                    },
+                  ),
+                );
+              } else {
+                debugPrint("");
+              }
+            },
+            child: const Text('Selected photos'),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              minimumSize: const Size.fromHeight(50),
+            ),
+            onPressed: () async {
+              if (dropdownValue.isNotEmpty) {
+                AppValues.userName = dropdownValue;
+                debugPrint("Will play video");
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext buildContext) {
+                      return const ManageVideos();
+                    },
+                  ),
+                );
+              } else {
+                debugPrint("");
+              }
+            },
+            child: const Text('Selected photos'),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              minimumSize: const Size.fromHeight(50),
+            ),
+            onPressed: () async {
+              if (dropdownValue.isNotEmpty) {
+                AppValues.userName = dropdownValue;
+
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext buildContext) {
+                      return const ShowQrCodePhoto();
+                    },
+                  ),
+                );
+              } else {
+                debugPrint("");
+              }
+            },
+            child: const Text('QR code scanner'),
           ),
         ]),
       ),

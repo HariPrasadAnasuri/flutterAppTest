@@ -11,11 +11,11 @@ import 'package:http/http.dart' as http;
 
 import 'assets/constants.dart' as constants;
 
-class ManagePhotos extends StatefulWidget {
-  const ManagePhotos({super.key});
+class ManageImportantPhotos extends StatefulWidget {
+  const ManageImportantPhotos({super.key});
 
   @override
-  State<ManagePhotos> createState() => _ManagePhotosState();
+  State<ManageImportantPhotos> createState() => _ManageImportantPhotosState();
 }
 
 //final LocalStorage storage = LocalStorage('localstorage_app');
@@ -24,7 +24,7 @@ List<String> textArray = [];
 int currentPageSelected = 0;
 PinchZoomImage pinchZoomImage = PinchZoomImage();
 
-class _ManagePhotosState extends State<ManagePhotos> {
+class _ManageImportantPhotosState extends State<ManageImportantPhotos> {
   late String noteEntered;
   late String panDirection;
   void getFileInfoAndUpdateStatus() async {

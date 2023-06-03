@@ -23,3 +23,4 @@ adb uninstall "com.example.flutter_application_1"
 
 On scroll load images
 https://www.youtube.com/watch?v=JaVjHDdoVOg
+
