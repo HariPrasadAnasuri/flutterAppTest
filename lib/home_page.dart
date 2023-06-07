@@ -1,11 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/alexa_voice_says.dart';
-import 'package:flutter_application_1/harsha_task.dart';
-import 'package:flutter_application_1/learn_flutter_page.dart';
 import 'package:flutter_application_1/list_photos.dart';
-import 'package:flutter_application_1/manage_photos.dart';
 import 'package:flutter_application_1/manage_videos.dart';
 import 'package:flutter_application_1/selected_photos.dart';
 import 'package:flutter_application_1/shared_values.dart';
