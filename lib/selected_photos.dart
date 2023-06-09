@@ -64,10 +64,21 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
   }
 
   Future<bool> initialCalls() async{
-    await getTheLastSelectedPhotoInfoForPrint();
+    if(AppValues.fromQrScreen){
+      await updateThePhotoIdInfoByUuid();
+    }else{
+      await getTheLastSelectedPhotoInfoForPrint();
+    }
     debugPrint("AppValues.importantPhotosDate: ${AppValues.importantPhotosDate}");
     await getsetOfImages();
+
     controller = FixedExtentScrollController();
+    return true;
+  }
+  Future<bool> updateThePhotoIdInfoByUuid() async {
+    var photoInfoUuidUrl = Uri.parse(AppValues.getUrlForToGetFileByUuid());
+    var photoInfoUuidResponse = await http.get(photoInfoUuidUrl);
+    AppValues.importantPhotosDate = jsonDecode(photoInfoUuidResponse.body)["createdDate"];
     return true;
   }
   Future<bool> getTheLastSelectedPhotoInfoForPrint() async {
@@ -98,16 +109,16 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
   void downloadFile() async{
     ProgressDialog pd = ProgressDialog(context: context);
     pd.show(max: 100, msg: 'File Downloading...');
-    Map<Permission, PermissionStatus> statuses = await [
-      Permission.storage,
-      //add more permission to request here.
-    ].request();
+    // Map<Permission, PermissionStatus> statuses = await [
+    //   Permission.storage,
+    //   //add more permission to request here.
+    // ].request();
 
-    if(statuses[Permission.storage]!.isGranted){
-      var dir = await DownloadsPathProvider.downloadsDirectory;
+    if(true){
+      var dir = "/Users/hariprasad/Movies";
       if(dir != null){
         String savename = "${AppValues.fileId}.jpg";
-        String savePath = dir.path + "/$savename";
+        String savePath = dir + "/$savename";
         print(savePath);
         //output:  /storage/emulated/0/Download/banner.png
 

@@ -1,5 +1,7 @@
 class AppValues {
   static int fileId = 0;
+  static String uuid = "";
+  static bool fromQrScreen = false;
   static String createdDate = "2015-08-11 22:26:34";
   // LENOVO
   static String host = 'http://[2405:201:c018:417d:2068:586:46a9:b599]:7000';
@@ -91,5 +93,9 @@ class AppValues {
 
   static String getImageShrunkUrlUsingIndex(imageId) {
     return '$host/photos/$imageId/shrink?userName=$userName';
+  }
+
+  static String getUrlForToGetFileByUuid(){
+    return '$host/photos/fileInfoByUuid/$uuid';
   }
 }
