@@ -3,8 +3,9 @@ class AppValues {
   static String uuid = "";
   static bool fromQrScreen = false;
   static String createdDate = "2015-08-11 22:26:34";
+  static String dateForVideos = "2015-08-11 22:26:34";
   // LENOVO
-  static String host = 'http://[2405:201:c018:417d:2068:586:46a9:b599]:7000';
+  static String host = 'http://[2405:201:c018:4150:252f:56b1:c7e3:eda9]:7000';
 
   // static String host = 'http://[2405:201:c018:4016:7e67:1e67:4cc5:d0fd]:7000';
 
@@ -77,6 +78,14 @@ class AppValues {
 
   static String getNextSetOfImagesInfo() {
     return '$host/photos/getNextSet?name=$userName';
+  }
+
+  static String getNextSetOfVideosInfo() {
+    return '$host/videos/getNextSet?createdDate=$dateForVideos';
+  }
+
+  static String getUrlForVideo(id) {
+    return '$host/videos/$id';
   }
 
   static String getNextSetOfImportantImagesInfo() {
