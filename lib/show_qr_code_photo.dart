@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/selected_photos.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
 
 import 'manage_photos.dart';

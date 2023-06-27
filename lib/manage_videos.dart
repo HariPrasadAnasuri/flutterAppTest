@@ -1,9 +1,8 @@
 import 'dart:async';
 
-import 'package:chewie/chewie.dart';
+import 'package:better_player/better_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/shared_values.dart';
-import 'package:video_player/video_player.dart';
 
 import 'model/Video.dart';
 import 'package:http/http.dart' as http;
@@ -18,8 +17,7 @@ class ManageVideos extends StatefulWidget {
 
 class _ManageVideosState extends State<ManageVideos> {
   List<Video>? videoList;
-  VideoPlayerController? _videoPlayerController;
-  late ChewieController _chewieController;
+  late BetterPlayerController _chewieController;
   int currentIndex = 0;
 
   @override
@@ -37,7 +35,7 @@ class _ManageVideosState extends State<ManageVideos> {
   @override
   void dispose() {
     // Ensure disposig of the VideoPlayerController to free up resources.
-    _videoPlayerController?.dispose();
+
     _chewieController.dispose();
     super.dispose();
   }
@@ -64,9 +62,15 @@ class _ManageVideosState extends State<ManageVideos> {
               }
             }
           },
-          child: Chewie(
-            controller: _chewieController,
-          ),
+          child: Align(
+            alignment: Alignment.center,
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: BetterPlayer(
+                controller: _chewieController,
+              ),
+            ),
+          )
       ),
         );
     }
@@ -101,21 +105,22 @@ class _ManageVideosState extends State<ManageVideos> {
 
     if(!isItFirtLoad){
       debugPrint("Disposing the video");
-      _videoPlayerController?.dispose();
+      _chewieController.pause();
       _chewieController.dispose();
-
     }
-    _videoPlayerController = VideoPlayerController.network(videoList![currentIndex].videoUrl);
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController!,
-      allowedScreenSleep: false,
-      allowPlaybackSpeedChanging: true,
-      zoomAndPan: true,
-      //fullScreenByDefault: true,
-      //aspectRatio: _videoPlayerController!.value.aspectRatio,
-      autoInitialize: true,
-
-      // Add any other Chewie options you need
+    BetterPlayerDataSource betterPlayerDataSource = BetterPlayerDataSource(
+        BetterPlayerDataSourceType.network,
+        videoList![currentIndex].videoUrl
+    );
+    _chewieController = BetterPlayerController(
+        const BetterPlayerConfiguration(
+          allowedScreenSleep: false,
+          autoPlay: true,
+          aspectRatio: 16 / 9,
+          fit: BoxFit.fitHeight,
+          expandToFill: true
+        ),
+        betterPlayerDataSource: betterPlayerDataSource
     );
   }
 }
