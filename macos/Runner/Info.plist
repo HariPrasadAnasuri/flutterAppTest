@@ -28,5 +28,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>Add the description of the permission you need here.</string>
 </dict>
 </plist>

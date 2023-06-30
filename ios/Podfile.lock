@@ -1,0 +1,59 @@
+PODS:
+  - downloads_path_provider_28 (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - image_save (0.0.1):
+    - Flutter
+  - MTBBarcodeScanner (5.0.11)
+  - path_provider_ios (0.0.1):
+    - Flutter
+  - "permission_handler (5.1.0+2)":
+    - Flutter
+  - qr_code_scanner (0.2.0):
+    - Flutter
+    - MTBBarcodeScanner
+  - video_player_avfoundation (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - downloads_path_provider_28 (from `.symlinks/plugins/downloads_path_provider_28/ios`)
+  - Flutter (from `Flutter`)
+  - image_save (from `.symlinks/plugins/image_save/ios`)
+  - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
+  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
+  - qr_code_scanner (from `.symlinks/plugins/qr_code_scanner/ios`)
+  - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/ios`)
+
+SPEC REPOS:
+  trunk:
+    - MTBBarcodeScanner
+
+EXTERNAL SOURCES:
+  downloads_path_provider_28:
+    :path: ".symlinks/plugins/downloads_path_provider_28/ios"
+  Flutter:
+    :path: Flutter
+  image_save:
+    :path: ".symlinks/plugins/image_save/ios"
+  path_provider_ios:
+    :path: ".symlinks/plugins/path_provider_ios/ios"
+  permission_handler:
+    :path: ".symlinks/plugins/permission_handler/ios"
+  qr_code_scanner:
+    :path: ".symlinks/plugins/qr_code_scanner/ios"
+  video_player_avfoundation:
+    :path: ".symlinks/plugins/video_player_avfoundation/ios"
+
+SPEC CHECKSUMS:
+  downloads_path_provider_28: 7425048683ec0b86238361bd93795e91c2bc61a2
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  image_save: 66ab41fa2c60bc9569e55563ea287cced7b79fd1
+  MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
+  path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
+  permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
+  qr_code_scanner: bb67d64904c3b9658ada8c402e8b4d406d5d796e
+  video_player_avfoundation: 81e49bb3d9fb63dccf9fa0f6d877dc3ddbeac126
+
+PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
+
+COCOAPODS: 1.12.1
