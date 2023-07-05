@@ -5,6 +5,7 @@ import 'package:flutter_application_1/selected_photos.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:flutter_application_1/show_qr_code_photo.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,6 +20,13 @@ class _HomePageState extends State<HomePage> {
   String textEntered = "";
   String url  = "";
   late String dropdownValue = list.first;
+
+  @override
+  void initState() {
+    super.initState();
+    setIpv6Address();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -233,5 +241,28 @@ class _HomePageState extends State<HomePage> {
         ]),
       ),
     ));
+  }
+  void setIpv6Address() async{
+    Map<String, String> headers = {
+      'Authorization': 'Bearer 2PJqDIbR1I76Jb3BijggUe0HJEy_41HZk6aT2WsJzt395DdSV',
+      'ngrok-version': '2'
+    };
+    String ngrokUrl;
+    var response = await http.get(Uri.parse(AppValues.getNgrokApiUrl()), headers: headers);
+    if (response.statusCode == 200) {
+      ngrokUrl = jsonDecode(response.body)['tunnels'][0]['public_url'];
+      debugPrint("ngrokUrl: $ngrokUrl");
+    } else {
+      throw Exception('Failed to fetch ipv6 address');
+    }
+
+    final ipv6Response = await http.get(Uri.parse("$ngrokUrl/alexa-voice-monkey/getIpv6Address"));
+    if (response.statusCode == 200) {
+      debugPrint("Ipv6 Address: ${ipv6Response.body}");
+      AppValues.ipv6Address = ipv6Response.body;
+    } else {
+      throw Exception('Failed to fetch ipv6 address');
+    }
+
   }
 }

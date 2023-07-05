@@ -116,7 +116,7 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
       if(dir != null){
         String savename = "${AppValues.fileId}.jpg";
         String savePath = dir + "/$savename";
-        print(savePath);
+        debugPrint(savePath);
         //output:  /storage/emulated/0/Download/banner.png
 
         try {
@@ -126,18 +126,18 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
               onReceiveProgress: (received, total) {
                 if (total != -1) {
                   int progress = (received / total * 100).toInt();
-                  print(progress.toStringAsFixed(0) + "%");
+                  debugPrint(progress.toStringAsFixed(0) + "%");
                   //you can build progressbar feature too
                   pd.update(value: progress, msg: "Completed");
                 }
               });
-          print("File is saved to download folder.");
+          debugPrint("File is saved to download folder.");
         } on DioError catch (e) {
-          print(e.message);
+          debugPrint(e.message);
         }
       }
     }else{
-      print("No permission to read and write.");
+      debugPrint("No permission to read and write.");
     }
   }
 
@@ -357,7 +357,7 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   // Add your button action here
-                                  print('Button pressed!');
+                                  debugPrint('Button pressed!');
                                   downloadFile();
                                 },
                                 child: Text('Download'),
@@ -399,12 +399,12 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
     );
 
     if(pickedDate != null ){
-      print(pickedDate);  //pickedDate output format => 2021-03-10 00:00:00.000
+      debugPrint(pickedDate as String?);  //pickedDate output format => 2021-03-10 00:00:00.000
       AppValues.setImportantPhotosDate(pickedDate.toString());
       //String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-      //print(formattedDate); //formatted date output using intl package =>  2021-03-16
+      //debugPrint(formattedDate); //formatted date output using intl package =>  2021-03-16
     }else{
-      print("Date is not selected");
+      debugPrint("Date is not selected");
     }
   }
   void _showPopup(BuildContext context) {

@@ -81,8 +81,8 @@ class _RootPageState extends State<RootPage> {
 
   void _datePicker(BuildContext context) async{
     DateTime selectedDate;
-    if(AppValues.importantPhotosDate.isNotEmpty){
-      selectedDate = DateTime.parse(AppValues.importantPhotosDate);
+    if(AppValues.dateForVideos.isNotEmpty){
+      selectedDate = DateTime.parse(AppValues.dateForVideos);
     }else{
       selectedDate = DateTime.now();
     }
@@ -94,12 +94,12 @@ class _RootPageState extends State<RootPage> {
     );
 
     if(pickedDate != null ){
-      print(pickedDate);  //pickedDate output format => 2021-03-10 00:00:00.000
-      AppValues.setImportantPhotosDate(pickedDate.toString());
+      debugPrint(pickedDate.toString());  //pickedDate output format => 2021-03-10 00:00:00.000
+      AppValues.dateForVideos = pickedDate.toString();
       //String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
       //print(formattedDate); //formatted date output using intl package =>  2021-03-16
     }else{
-      print("Date is not selected");
+      debugPrint("Date is not selected");
     }
   }
 }

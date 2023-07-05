@@ -5,7 +5,8 @@ class AppValues {
   static String createdDate = "2015-08-11 22:26:34";
   static String dateForVideos = "2015-08-11 22:26:34";
   // LENOVO
-  static String host = 'http://[2405:201:c018:41be:e2cd:d855:bfa5:813a]:7000';
+  static String ipv6Address = "2405:201:c018:41be:e2cd:d855:bfa5:813a";
+  static String host = 'http://[$ipv6Address]:7000';
 
   // static String host = 'http://[2405:201:c018:4016:7e67:1e67:4cc5:d0fd]:7000';
 
@@ -106,5 +107,9 @@ class AppValues {
 
   static String getUrlForToGetFileByUuid(){
     return '$host/photos/fileInfoByUuid/$uuid';
+  }
+
+  static String getNgrokApiUrl(){
+    return 'https://api.ngrok.com/tunnels';
   }
 }
