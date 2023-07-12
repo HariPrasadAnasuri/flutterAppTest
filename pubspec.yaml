@@ -32,7 +32,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  http: ^0.13.5
+  http: ^1.1.0
   localstorage: ^4.0.0+1
   qr_code_scanner: ^1.0.1
   intl: ^0.17.0
@@ -42,6 +42,10 @@ dependencies:
   image_save: ^5.0.0
   better_player: 0.0.83
   async: ^2.11.0
+  flutter_animated_button: ^2.0.3
+  google_fonts: ^5.1.0
+  flutter_tree: ^2.0.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

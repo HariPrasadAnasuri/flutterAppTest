@@ -8,7 +8,7 @@ import 'package:flutter_application_1/shared_values.dart';
 import 'package:http/http.dart' as http;
 import 'package:sn_progress_dialog/progress_dialog.dart';
 
-import 'manage_photos.dart';
+import 'show_photo.dart';
 
 class SelectedPhotos extends StatefulWidget {
   const SelectedPhotos({super.key});
@@ -63,7 +63,7 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
   Future<bool> initialCalls() async{
     if(AppValues.fromQrScreen){
       await updateThePhotoIdInfoByUuid();
-    }else{
+    }else if(AppValues.fromToMarkForPrint){
       await getTheLastSelectedPhotoInfoForPrint();
     }
     debugPrint("AppValues.importantPhotosDate: ${AppValues.importantPhotosDate}");
@@ -187,7 +187,7 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (BuildContext buildContext) {
-                return const ManagePhotos();
+                return const ShowPhoto();
               },
             ),
           );
@@ -399,7 +399,6 @@ class _SelectedPhotosState extends State<SelectedPhotos> {
     );
 
     if(pickedDate != null ){
-      debugPrint(pickedDate as String?);  //pickedDate output format => 2021-03-10 00:00:00.000
       AppValues.setImportantPhotosDate(pickedDate.toString());
       //String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
       //debugPrint(formattedDate); //formatted date output using intl package =>  2021-03-16

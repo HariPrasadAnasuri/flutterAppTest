@@ -2,6 +2,7 @@ class AppValues {
   static int fileId = 0;
   static String uuid = "";
   static bool fromQrScreen = false;
+  static bool fromToMarkForPrint = false;
   static String createdDate = "2015-08-11 22:26:34";
   static String dateForVideos = "2015-08-11 22:26:34";
   // LENOVO
@@ -56,7 +57,9 @@ class AppValues {
   static void setImportantPhotosDate(String dateInString) {
     importantPhotosDate = dateInString;
   }
-
+  static String getImportantPhotosDate() {
+    return importantPhotosDate;
+  }
   static String getFileIdUrl() {
     return '$host/getMyProgress?name=$userName';
   }
@@ -107,6 +110,10 @@ class AppValues {
 
   static String getUrlForToGetFileByUuid(){
     return '$host/photos/fileInfoByUuid/$uuid';
+  }
+
+  static String getFileStructureForPhotos(){
+    return '$host/photos/getFileStructureForPhotos';
   }
 
   static String getNgrokApiUrl(){

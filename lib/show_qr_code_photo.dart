@@ -8,7 +8,7 @@ import 'package:flutter_application_1/shared_values.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:http/http.dart' as http;
 
-import 'manage_photos.dart';
+import 'show_photo.dart';
 
 class ShowQrCodePhoto extends StatefulWidget {
   const ShowQrCodePhoto({super.key});
@@ -83,7 +83,7 @@ class _ShowQrCodePhotoState extends State<ShowQrCodePhoto> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (BuildContext buildContext) {
-                    return const ManagePhotos();
+                    return const ShowPhoto();
                   },
                 ),
               );

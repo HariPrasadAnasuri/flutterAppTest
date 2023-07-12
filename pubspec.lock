@@ -150,6 +150,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_animated_button:
+    dependency: "direct main"
+    description:
+      name: flutter_animated_button
+      sha256: deb125817322cfcc4dc05e43ab79f9597bfe4837200ff145c95247ab88c2f89d
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.3"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -163,6 +171,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_tree:
+    dependency: "direct main"
+    description:
+      name: flutter_tree
+      sha256: "321cf5dc5e1831bbf0d99a775af4aa5ea0b105223c65cfb5047729195339e8ef"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.3"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -192,6 +208,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.6.0"
+  google_fonts:
+    dependency: "direct main"
+    description:
+      name: google_fonts
+      sha256: e20ff62b158b96f392bfc8afe29dee1503c94fbea2cbe8186fd59b756b8ae982
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.1.0"
   html:
     dependency: transitive
     description:
@@ -204,10 +228,10 @@ packages:
     dependency: "direct main"
     description:
       name: http
-      sha256: "5895291c13fa8a3bd82e76d5627f69e0d85ca6a30dcac95c4ea19a5d555879c2"
+      sha256: "759d1a329847dd0f39226c688d3e06a6b8679668e350e2891a6474f8b4bb8525"
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.6"
+    version: "1.1.0"
   http_parser:
     dependency: transitive
     description:

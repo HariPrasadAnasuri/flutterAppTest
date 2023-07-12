@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:http/http.dart' as http;
 
-import 'manage_photos.dart';
+import 'show_photo.dart';
 
 class ListPhotos extends StatefulWidget {
   const ListPhotos({super.key});
@@ -135,7 +135,7 @@ class _ListPhotosState extends State<ListPhotos> {
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (BuildContext buildContext) {
-                return const ManagePhotos();
+                return const ShowPhoto();
               },
             ),
           );

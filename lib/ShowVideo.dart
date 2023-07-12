@@ -8,14 +8,14 @@ import 'model/Video.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class ManageVideos extends StatefulWidget {
-  const ManageVideos({super.key});
+class ShowVideo extends StatefulWidget {
+  const ShowVideo({super.key});
 
   @override
-  State<ManageVideos> createState() => _ManageVideosState();
+  State<ShowVideo> createState() => _ShowVideoState();
 }
 
-class _ManageVideosState extends State<ManageVideos> {
+class _ShowVideoState extends State<ShowVideo> {
   List<Video>? videoList;
   late BetterPlayerController _chewieController;
   int currentIndex = 0;
