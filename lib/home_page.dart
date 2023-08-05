@@ -7,6 +7,7 @@ import 'package:flutter_application_1/photos_page.dart';
 import 'package:flutter_application_1/selected_photos.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:flutter_application_1/show_qr_code_photo.dart';
+import 'package:flutter_application_1/tv-controller.dart';
 import 'package:flutter_application_1/videos_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -72,7 +73,7 @@ class _HomePageState extends State<HomePage> {
           }),
           const SizedBox(height: 12),
           AppUtility.createAnimationButton(
-              "File Structure",
+              "TV Controller",
               Colors.blueGrey,
               200,
               MediaQuery.of(context).size.width,
@@ -80,7 +81,7 @@ class _HomePageState extends State<HomePage> {
               const Color.fromARGB(255, 26, 163, 255),
               40,
               2, () {
-            onFileStructureButtonPressed();
+            onTvControllerButtonPressed();
           }),
         ]),
       ),
@@ -107,11 +108,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void onFileStructureButtonPressed() {
+  void onTvControllerButtonPressed() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (BuildContext buildContext) {
-          return const FileStructurePage();
+          return const TvController();
         },
       ),
     );
