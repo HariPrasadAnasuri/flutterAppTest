@@ -56,7 +56,19 @@ class _PhotosPageState extends State<PhotosPage> {
           40,
           2, () {
         onChosenPhotosButtonPressed();
-      })
+      }),
+      const SizedBox(height: 12),
+      AppUtility.createAnimationButton(
+          "QR Scanner",
+          Colors.blueGrey,
+          200,
+          MediaQuery.of(context).size.width,
+          const Color.fromARGB(60, 0, 255, 204),
+          const Color.fromARGB(255, 26, 163, 255),
+          40,
+          2, () {
+        onQrCodeControllerButtonPressed();
+      }),
     ]));
   }
 
@@ -92,4 +104,14 @@ class _PhotosPageState extends State<PhotosPage> {
             }
         });
   }
+  void onQrCodeControllerButtonPressed() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext buildContext) {
+          return const ShowQrCodePhoto();
+        },
+      ),
+    );
+  }
+
 }

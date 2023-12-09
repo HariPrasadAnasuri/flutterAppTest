@@ -15,31 +15,42 @@
 // import 'app_utility.dart';
 // import 'model/FileStructureNode.dart';
 //
-// class FileStructurePage extends StatefulWidget {
-//   const FileStructurePage({super.key});
+// class FamilyTreePage extends StatefulWidget {
+//   const FamilyTreePage({super.key});
 //
 //   @override
-//   State<FileStructurePage> createState() => _FileStructurePageState();
+//   State<FamilyTreePage> createState() => _FamilyTreePageState();
 // }
 //
-// class _FileStructurePageState extends State<FileStructurePage> {
+// class _FamilyTreePageState extends State<FamilyTreePage> {
 //   List<TreeNodeData>? fileStructureNode;
 //
-//   @override
-//   void initState() {
-//     super.initState();
-//     FileStructureProvider.getFileStructure().then((fileNode) {
-//       setState(() {
-//         fileStructureNode = fileNode;
-//       });
-//     });
-//   }
 //
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//           body:
-//           TreeView(data: fileStructureNode!)
+//         body: Center(
+//           child: TreeView(
+//             data: [
+//               TreeItem(
+//                 key: 'root',
+//                 title: 'John Doe',
+//                 children: [
+//                   TreeItem(
+//                     key: 'jane',
+//                     title: 'Jane Doe',
+//                     children: [
+//                       TreeItem(
+//                         key: 'john',
+//                         title: 'John Smith',
+//                       ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//             ],
+//           ),
+//         ),
 //     );
 //   }
 //
