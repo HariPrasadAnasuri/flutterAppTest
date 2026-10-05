@@ -52,11 +52,16 @@ class _ListVideosState extends State<ListVideos> with PagedPhotos {
     );
   }
 
-  void select(int index) {
+  void select(int index, {bool showInfo = true}) {
     final Map video = listOfImagesInfo[index];
     setState(() => selectedIndex = index);
-    showMessage("${video['createdDate']}\n${video['filePath']}");
+    if (showInfo) showMessage("${video['createdDate']}\n${video['filePath']}");
   }
+
+  // True when the app is being used with a TV remote / D-pad rather than
+  // touch (Flutter switches mode on the first key press or touch).
+  bool get usingRemote =>
+      FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
 
   Future<void> play(int index) async {
     setState(() => selectedIndex = index);
@@ -68,6 +73,8 @@ class _ListVideosState extends State<ListVideos> with PagedPhotos {
             initialIndex: index,
             // Keep the video that is playing selected here too
             onIndexChanged: (newIndex) => selectedIndex = newIndex,
+            // Lets the player keep going past the videos loaded so far
+            onLoadMore: loadMore,
           );
         },
       ),
@@ -131,9 +138,17 @@ class _ListVideosState extends State<ListVideos> with PagedPhotos {
     final Map video = listOfImagesInfo[index];
     return Padding(
       padding: const EdgeInsets.all(3),
-      child: GestureDetector(
-        onTap: () => select(index),
+      // An InkWell so a TV remote can focus the card: moving onto it selects
+      // it (the list scrolls along) and OK plays it. With touch, tap selects
+      // and double tap plays.
+      child: InkWell(
+        onTap: () => usingRemote ? play(index) : select(index),
         onDoubleTap: () => play(index),
+        onFocusChange: (focused) {
+          if (focused && usingRemote) select(index, showInfo: false);
+        },
+        focusColor: Colors.green.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(15),
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
@@ -150,12 +165,15 @@ class _ListVideosState extends State<ListVideos> with PagedPhotos {
                   url: AppValues.getVideoThumbnailUrl(video['id']),
                   errorIcon: Icons.movie,
                 ),
-                IconButton(
-                  iconSize: 72,
-                  color: Colors.white70,
-                  tooltip: 'Play',
-                  icon: const Icon(Icons.play_circle_fill),
-                  onPressed: () => play(index),
+                // Touch only; with a remote the whole card is the button.
+                ExcludeFocus(
+                  child: IconButton(
+                    iconSize: 72,
+                    color: Colors.white70,
+                    tooltip: 'Play',
+                    icon: const Icon(Icons.play_circle_fill),
+                    onPressed: () => play(index),
+                  ),
                 ),
                 Positioned(
                   bottom: 10,

@@ -106,6 +106,8 @@ class VideoMarkBar extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: () => onMark(action),
+        // Clearly visible highlight when moving here with a TV remote
+        focusColor: color.withOpacity(0.5),
         child: Container(
           color: selected ? color.withOpacity(0.25) : null,
           child: Column(

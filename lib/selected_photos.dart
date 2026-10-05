@@ -4,12 +4,12 @@ import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/app_utility.dart';
 import 'package:flutter_application_1/paged_photo_list.dart';
+import 'package:flutter_application_1/photo_gallery_viewer.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:http/http.dart' as http;
 import 'package:sn_progress_dialog/progress_dialog.dart';
-
-import 'show_photo.dart';
 
 class SelectedPhotos extends StatefulWidget {
   const SelectedPhotos({super.key});
@@ -128,6 +128,36 @@ class _SelectedPhotosState extends State<SelectedPhotos> with PagedPhotos {
     }
   }
 
+  void selectPhoto(int index) {
+    var currentSelectedItem = listOfImagesInfo[index];
+    debugPrint("Current selected image id ${currentSelectedItem["id"]}");
+    selectedImageId = currentSelectedItem["id"];
+    AppValues.fileId = selectedImageId!;
+    getFileInfoAndUpdateStatus(currentSelectedItem);
+    setState(() {
+      currentListIndexSelected = index;
+      AppValues.importantPhotosDate = currentSelectedItem["createdDate"];
+    });
+  }
+
+  // Opens the full-screen viewer; the photo showing when it closes becomes
+  // the selected one, so the bottom bar actions apply to it.
+  Future<void> openPhotoViewer(int index) async {
+    selectPhoto(index);
+    final lastIndex = await PhotoGalleryViewer.open(
+      context,
+      photos: listOfImagesInfo,
+      initialIndex: index,
+      imageUrl: (photo) => AppValues.getImageUrlUsingId(photo["id"]),
+      thumbnailUrl: (photo) =>
+          AppValues.getImageShrunkUrlUsingIdForImportantPhotos(
+              photo["id"].toString()),
+      onLoadMore: loadMore,
+    );
+    if (!mounted || lastIndex == null) return;
+    selectPhoto(lastIndex);
+  }
+
   void getFileInfoAndUpdateStatus(currentSelectedItem) async {
     setState(() {
       int selectedState = 0;
@@ -156,26 +186,6 @@ class _SelectedPhotosState extends State<SelectedPhotos> with PagedPhotos {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.arrow_forward),
-        onPressed: () {
-          //final nextIndex = controller.selectedItem + 1;
-          // controller.animateToItem(nextIndex,
-          //     duration: const Duration(seconds: 1), curve: Curves.easeInOut);
-          if (selectedImageId == null) {
-            showSelectPhotoMessage();
-            return;
-          }
-          AppValues.fileId = selectedImageId!;
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (BuildContext buildContext) {
-                return const ShowPhoto();
-              },
-            ),
-          );
-        },
-      ),
       bottomNavigationBar: NavigationBar(
         height: 50,
         backgroundColor: Colors.green[100],
@@ -261,27 +271,7 @@ class _SelectedPhotosState extends State<SelectedPhotos> with PagedPhotos {
                 child: Column(
                   children: <Widget>[
                     GestureDetector(
-                      onTap: () {
-                        debugPrint("Current Image id ${listOfImagesInfo[index]["id"]}");
-                        var currentSelectedItem = listOfImagesInfo[index];
-                        selectedImageId = currentSelectedItem["id"];
-                        AppValues.fileId = selectedImageId!;
-                        debugPrint(
-                            "Current selected image index ${currentSelectedItem["id"]}");
-                        getFileInfoAndUpdateStatus(currentSelectedItem);
-                        String createdDate = currentSelectedItem["createdDate"];
-                        String fileLocation = currentSelectedItem["filePath"];
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("$createdDate\n$fileLocation"),
-                            duration: const Duration(milliseconds: 1500),
-                          ),
-                        );
-                        setState(() {
-                          currentListIndexSelected = index;
-                          AppValues.importantPhotosDate = listOfImagesInfo[currentListIndexSelected!]["createdDate"];
-                        });
-                      },
+                      onTap: () => openPhotoViewer(index),
                       child: Container(
                         decoration: BoxDecoration(
                           border:
@@ -380,7 +370,7 @@ class _SelectedPhotosState extends State<SelectedPhotos> with PagedPhotos {
     }else{
       selectedDate = DateTime.now();
     }
-    DateTime? pickedDate = await showDatePicker(
+    DateTime? pickedDate = await AppUtility.showAppDatePicker(
         context: context, //context of current state
         initialDate: selectedDate,
         firstDate: DateTime(1990), //DateTime.now() - not to allow to choose before today.

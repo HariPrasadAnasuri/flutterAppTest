@@ -36,6 +36,10 @@ class AppValues {
     return '$host/photos/$fileId';
   }
 
+  static String getImageUrlUsingId(imageId) {
+    return '$host/photos/$imageId';
+  }
+
   static String getMarkImportantUrl() {
     return '$host/photos/$fileId/important?name=$userName';
   }

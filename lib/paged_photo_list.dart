@@ -40,12 +40,17 @@ mixin PagedPhotos<T extends StatefulWidget> on State<T> {
       hasMore = true;
       loadFailed = false;
     });
-    await _fetchNextSet();
+    await (_pendingFetch = _fetchNextSet());
   }
 
+  // The request in progress, so callers of loadMore() can wait for it.
+  Future<void>? _pendingFetch;
+
+  /// Fetches the next set. If one is already loading, waits for that instead.
   Future<void> loadMore() async {
-    if (isLoading || !hasMore || loadFailed) return;
-    await _fetchNextSet();
+    if (isLoading) return _pendingFetch;
+    if (!hasMore || loadFailed) return;
+    await (_pendingFetch = _fetchNextSet());
   }
 
   void retryLoad() {

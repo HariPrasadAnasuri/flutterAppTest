@@ -2,10 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/paged_photo_list.dart';
+import 'package:flutter_application_1/photo_gallery_viewer.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:http/http.dart' as http;
-
-import 'show_photo.dart';
 
 class ListPhotos extends StatefulWidget {
   const ListPhotos({super.key});
@@ -61,6 +60,34 @@ class _ListPhotosState extends State<ListPhotos> with PagedPhotos {
     );
   }
 
+  void selectPhoto(int index) {
+    var currentSelectedItem = listOfImagesInfo[index];
+    debugPrint("Current selected image id ${currentSelectedItem["id"]}");
+    selectedImageId = currentSelectedItem["id"];
+    AppValues.fileId = selectedImageId!;
+    getFileInfoAndUpdateStatus(currentSelectedItem);
+    setState(() {
+      currentListIndexSelected = index;
+    });
+  }
+
+  // Opens the full-screen viewer; the photo showing when it closes becomes
+  // the selected one, so the bottom bar actions apply to it.
+  Future<void> openPhotoViewer(int index) async {
+    selectPhoto(index);
+    final lastIndex = await PhotoGalleryViewer.open(
+      context,
+      photos: listOfImagesInfo,
+      initialIndex: index,
+      imageUrl: (photo) => AppValues.getImageUrlUsingId(photo["id"]),
+      thumbnailUrl: (photo) =>
+          AppValues.getImageShrunkUrlUsingIndex(photo["id"].toString()),
+      onLoadMore: loadMore,
+    );
+    if (!mounted || lastIndex == null) return;
+    selectPhoto(lastIndex);
+  }
+
   void getFileInfoAndUpdateStatus(currentSelectedItem) async {
     setState(() {
       int selectedState = 0;
@@ -103,26 +130,6 @@ class _ListPhotosState extends State<ListPhotos> with PagedPhotos {
         ],
       ),
       backgroundColor: Colors.grey,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.arrow_forward),
-        onPressed: () {
-          //final nextIndex = controller.selectedItem + 1;
-          // controller.animateToItem(nextIndex,
-          //     duration: const Duration(seconds: 1), curve: Curves.easeInOut);
-          if (selectedImageId == null) {
-            showSelectPhotoMessage();
-            return;
-          }
-          AppValues.fileId = selectedImageId!;
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (BuildContext buildContext) {
-                return const ShowPhoto();
-              },
-            ),
-          );
-        },
-      ),
       bottomNavigationBar: NavigationBar(
         height: 50,
         backgroundColor: Colors.green[100],
@@ -211,26 +218,7 @@ class _ListPhotosState extends State<ListPhotos> with PagedPhotos {
                 child: Column(
                   children: <Widget>[
                     GestureDetector(
-                      onTap: () {
-                        debugPrint("Current Image id ${listOfImagesInfo[index]["id"]}");
-                        var currentSelectedItem = listOfImagesInfo[index];
-                        selectedImageId = currentSelectedItem["id"];
-                        AppValues.fileId = selectedImageId!;
-                        debugPrint(
-                            "Current selected image index ${currentSelectedItem["id"]}");
-                        getFileInfoAndUpdateStatus(currentSelectedItem);
-                        String createdDate = currentSelectedItem["createdDate"];
-                        String fileLocation = currentSelectedItem["filePath"];
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("$createdDate\n$fileLocation"),
-                            duration: const Duration(milliseconds: 1500),
-                          ),
-                        );
-                        setState(() {
-                          currentListIndexSelected = index;
-                        });
-                      },
+                      onTap: () => openPhotoViewer(index),
                       child: Container(
                         decoration: BoxDecoration(
                           border:

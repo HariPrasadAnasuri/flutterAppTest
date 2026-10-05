@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_application_1/app_utility.dart';
 import 'package:flutter_application_1/home_page.dart';
 import 'package:flutter_application_1/profile_page.dart';
 import 'package:flutter_application_1/shared_values.dart';
@@ -14,6 +16,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      // Android TV remotes (e.g. Mi Box) send "select" for the OK/centre
+      // button, which Flutter doesn't map to a press by default.
+      shortcuts: <ShortcutActivator, Intent>{
+        ...WidgetsApp.defaultShortcuts,
+        const SingleActivator(LogicalKeyboardKey.select): const ActivateIntent(),
+      },
       theme: ThemeData(primarySwatch: Colors.cyan),
       home: const RootPage(),
     );
@@ -86,7 +94,7 @@ class _RootPageState extends State<RootPage> {
     }else{
       selectedDate = DateTime.now();
     }
-    DateTime? pickedDate = await showDatePicker(
+    DateTime? pickedDate = await AppUtility.showAppDatePicker(
         context: context, //context of current state
         initialDate: selectedDate,
         firstDate: DateTime(1990), //DateTime.now() - not to allow to choose before today.

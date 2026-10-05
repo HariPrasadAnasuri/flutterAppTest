@@ -105,7 +105,7 @@ class _TvControllerState extends State<TvController> {
     }else{
       selectedDate = DateTime.now();
     }
-    DateTime? pickedDate = await showDatePicker(
+    DateTime? pickedDate = await AppUtility.showAppDatePicker(
         context: context, //context of current state
         initialDate: selectedDate,
         firstDate: DateTime(1990), //DateTime.now() - not to allow to choose before today.

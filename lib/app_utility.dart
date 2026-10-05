@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_button/flutter_animated_button.dart';
 import 'package:flutter_application_1/shared_values.dart';
+import 'package:flutter_application_1/tv_date_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppUtility{
@@ -11,13 +12,37 @@ class AppUtility{
     }else{
       selectedDate = DateTime.now();
     }
-    DateTime? pickedDate = await showDatePicker(
+    DateTime? pickedDate = await showAppDatePicker(
         context: context, //context of current state
         initialDate: selectedDate,
         firstDate: DateTime(1990), //DateTime.now() - not to allow to choose before today.
         lastDate: DateTime(2101)
     );
     return pickedDate;
+  }
+
+  /// showDatePicker, except when the app is being used with a TV remote /
+  /// D-pad: the calendar grid keeps the arrow keys there, so a remote can't
+  /// reach OK. Flutter switches to the traditional highlight mode once a key
+  /// is pressed, and to touch mode on a touch.
+  static Future<DateTime?> showAppDatePicker({
+    required BuildContext context,
+    required DateTime initialDate,
+    required DateTime firstDate,
+    required DateTime lastDate,
+  }) {
+    if (FocusManager.instance.highlightMode == FocusHighlightMode.traditional) {
+      return showTvDatePicker(
+          context: context,
+          initialDate: initialDate,
+          firstDate: firstDate,
+          lastDate: lastDate);
+    }
+    return showDatePicker(
+        context: context,
+        initialDate: initialDate,
+        firstDate: firstDate,
+        lastDate: lastDate);
   }
   static Widget createAnimationButton(
       String buttonText, Color textColor, double buttonHeight,
