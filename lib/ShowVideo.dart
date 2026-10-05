@@ -19,10 +19,24 @@ class _ShowVideoState extends State<ShowVideo> {
   List<Video>? videoList;
   late BetterPlayerController _chewieController;
   int currentIndex = 0;
+  final TransformationController _zoomController = TransformationController();
+  bool _isZoomed = false;
+
+  void _onZoomChanged() {
+    final isZoomed = _zoomController.value.getMaxScaleOnAxis() > 1.01;
+    if (isZoomed != _isZoomed) {
+      setState(() => _isZoomed = isZoomed);
+    }
+  }
+
+  void _resetZoom() {
+    _zoomController.value = Matrix4.identity();
+  }
 
   @override
   void initState() {
     super.initState();
+    _zoomController.addListener(_onZoomChanged);
     VideoProvider.fetchVideos().then((videos) {
       setState(() {
         debugPrint("Setting videos:${videos?.length}");
@@ -37,6 +51,7 @@ class _ShowVideoState extends State<ShowVideo> {
     // Ensure disposig of the VideoPlayerController to free up resources.
 
     _chewieController.dispose();
+    _zoomController.dispose();
     super.dispose();
   }
 
@@ -48,8 +63,17 @@ class _ShowVideoState extends State<ShowVideo> {
       return
         Scaffold(
           backgroundColor: Colors.grey,
+          floatingActionButton: _isZoomed
+              ? FloatingActionButton.small(
+                  onPressed: _resetZoom,
+                  tooltip: 'Reset zoom',
+                  child: const Icon(Icons.zoom_out_map),
+                )
+              : null,
           body: GestureDetector(
-          onHorizontalDragEnd: (DragEndDetails details) {
+          // While zoomed, one-finger drags pan the video instead of
+          // switching to the next/previous one.
+          onHorizontalDragEnd: _isZoomed ? null : (DragEndDetails details) {
             if (details.primaryVelocity! < 0) {
               // Swiped left, play next video
               if (currentIndex < videoList!.length - 1) {
@@ -66,8 +90,15 @@ class _ShowVideoState extends State<ShowVideo> {
             alignment: Alignment.center,
             child: AspectRatio(
               aspectRatio: 16 / 9,
-              child: BetterPlayer(
-                controller: _chewieController,
+              // Pinch to zoom (up to 5x); drag to pan once zoomed.
+              child: InteractiveViewer(
+                transformationController: _zoomController,
+                minScale: 1,
+                maxScale: 5,
+                panEnabled: _isZoomed,
+                child: BetterPlayer(
+                  controller: _chewieController,
+                ),
               ),
             ),
           )
@@ -101,6 +132,7 @@ class _ShowVideoState extends State<ShowVideo> {
   }
   void setVideo(int newIndex, isItFirtLoad){
     currentIndex = newIndex;
+    _resetZoom();
     debugPrint("videoList![currentIndex].videoUrl: ${videoList![currentIndex].videoUrl}");
 
     if(!isItFirtLoad){

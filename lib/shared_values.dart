@@ -6,8 +6,8 @@ class AppValues {
   static String createdDate = "2015-08-11 22:26:34";
   static String dateForVideos = "2015-08-11 22:26:34";
   // LENOVO
-  static String ipv6Address = "2409:40f0:11c8:f6eb:beaf:b733:f864:9bb6";
-  static String host = 'http://[$ipv6Address]:8071/manage-photos';
+  static String ipv6Address = "fd7a:115c:a1e0::5c2b:4a2e";
+  static String host = 'http://[$ipv6Address]:7000/manage-photos';
   static String voiceMonkeyAppHost = 'http://[$ipv6Address]:8085';
 
   // static String host = 'http://[2405:201:c018:4016:7e67:1e67:4cc5:d0fd]:7000';
@@ -93,8 +93,8 @@ class AppValues {
     return '$host/videos/$id';
   }
 
-  static String getNextSetOfImportantImagesInfo() {
-    return '$host/important/photos/getNextSet?createdDate=$importantPhotosDate';
+  static String getNextSetOfImportantImagesInfo([String? fromCreatedDate]) {
+    return '$host/important/photos/getNextSet?createdDate=${fromCreatedDate ?? importantPhotosDate}';
   }
 
   static String getTheLastSelectedPhotoInfoForPrint() {

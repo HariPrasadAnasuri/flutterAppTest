@@ -24,3 +24,12 @@ adb uninstall "com.example.flutter_application_1"
 On scroll load images
 https://www.youtube.com/watch?v=JaVjHDdoVOg
 
+- Flutter SDK path: /Volumes/MacOnly/appAssets/flutter
+- Dart SDK path: /Volumes/MacOnly/appAssets/flutter/bin/cache/dart-sdk
+
+cd /Volumes/MacOnly/flutterAppTest
+flutter run
+flutter run -d RZCX11DS3VB
+While it's running, press r to hot reload, R to hot restart, and q to quit.
+source /Volumes/MacOnly/appAssets/env.sh
+flutter devices

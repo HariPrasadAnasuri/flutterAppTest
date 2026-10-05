@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/paged_photo_list.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:http/http.dart' as http;
 
@@ -35,44 +35,30 @@ class RadiantGradientMask extends StatelessWidget {
     );
   }
 }
-class _ListPhotosState extends State<ListPhotos> {
-  List imgList = [];
-  List highlightColors = [];
-  late int currentListIndexSelected;
-  List listOfImagesInfo = [];
-  late int selectedImageId;
-  late FixedExtentScrollController controller;
+class _ListPhotosState extends State<ListPhotos> with PagedPhotos {
+  int? currentListIndexSelected;
+  int? selectedImageId;
   late String lastDateSelected;
   String selectedListItemColor = "red";
   IconData testIcon = Icons.favorite;
-  int _currentMax = 10;
 
-  _getMoreData() {
-    for (int i = _currentMax; i < _currentMax + 10; i++) {
-      listOfImagesInfo.add("Item : ${i + 1}");
-    }
-
-    _currentMax = _currentMax + 10;
-
-    setState(() {});
+  @override
+  Uri nextSetUrl(Map? lastItem) {
+    return Uri.parse(AppValues.getNextSetOfImagesInfo());
   }
 
-  Future<List> getsetOfImages() async {
-    imgList.clear();
-    highlightColors.clear();
-    highlightColors.add(Colors.blue);
-    debugPrint("Inside getsetOfImages()");
-    var url = Uri.parse(AppValues.getNextSetOfImagesInfo());
-    debugPrint("url $url");
-    var result = await http.get(url);
-    listOfImagesInfo = jsonDecode(result.body);
-    //debugPrint("response $response");
-    for (var i = 0; i < listOfImagesInfo.length; i++) {
-      setState(() {
-        highlightColors.add(Colors.blue);
-      });
-    }
-    return listOfImagesInfo;
+  Future<void> getsetOfImages() async {
+    currentListIndexSelected = null;
+    await reloadImages();
+  }
+
+  void showSelectPhotoMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Tap a photo to select it first"),
+        duration: Duration(milliseconds: 1500),
+      ),
+    );
   }
 
   void getFileInfoAndUpdateStatus(currentSelectedItem) async {
@@ -94,14 +80,6 @@ class _ListPhotosState extends State<ListPhotos> {
   void initState() {
     super.initState();
     getsetOfImages();
-
-    controller = FixedExtentScrollController();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    controller.dispose();
   }
 
   @override
@@ -131,7 +109,11 @@ class _ListPhotosState extends State<ListPhotos> {
           //final nextIndex = controller.selectedItem + 1;
           // controller.animateToItem(nextIndex,
           //     duration: const Duration(seconds: 1), curve: Curves.easeInOut);
-          AppValues.fileId = selectedImageId;
+          if (selectedImageId == null) {
+            showSelectPhotoMessage();
+            return;
+          }
+          AppValues.fileId = selectedImageId!;
           Navigator.of(context).push(
             MaterialPageRoute(
               builder: (BuildContext buildContext) {
@@ -161,6 +143,10 @@ class _ListPhotosState extends State<ListPhotos> {
         ],
         onDestinationSelected: (int index) async {
           var url;
+          if (index >= 2 && currentListIndexSelected == null) {
+            showSelectPhotoMessage();
+            return;
+          }
           if (index == 0) {
 
           }
@@ -169,10 +155,10 @@ class _ListPhotosState extends State<ListPhotos> {
           }
           if (index == 2) {
             setState(() {
-              listOfImagesInfo[currentListIndexSelected]["visited"] = true;
-              listOfImagesInfo[currentListIndexSelected]["tobeDeleted"] = false;
-              listOfImagesInfo[currentListIndexSelected]["important"] = false;
-              AppValues.fileId = selectedImageId;
+              listOfImagesInfo[currentListIndexSelected!]["visited"] = true;
+              listOfImagesInfo[currentListIndexSelected!]["tobeDeleted"] = false;
+              listOfImagesInfo[currentListIndexSelected!]["important"] = false;
+              AppValues.fileId = selectedImageId!;
               url = Uri.parse(AppValues.getMarkAsVisitedUrl());
               debugPrint("URL $url");
             });
@@ -181,10 +167,10 @@ class _ListPhotosState extends State<ListPhotos> {
           }
           if (index == 3) {
             setState(() {
-              listOfImagesInfo[currentListIndexSelected]["important"] = true;
-              listOfImagesInfo[currentListIndexSelected]["visited"] = false;
-              listOfImagesInfo[currentListIndexSelected]["tobeDeleted"] = false;
-              AppValues.fileId = selectedImageId;
+              listOfImagesInfo[currentListIndexSelected!]["important"] = true;
+              listOfImagesInfo[currentListIndexSelected!]["visited"] = false;
+              listOfImagesInfo[currentListIndexSelected!]["tobeDeleted"] = false;
+              AppValues.fileId = selectedImageId!;
               url = Uri.parse(AppValues.getMarkImportantUrl());
               debugPrint("URL $url");
             });
@@ -193,10 +179,10 @@ class _ListPhotosState extends State<ListPhotos> {
           }
           if (index == 4) {
             setState(() {
-              listOfImagesInfo[currentListIndexSelected]["tobeDeleted"] = true;
-              listOfImagesInfo[currentListIndexSelected]["important"] = false;
-              listOfImagesInfo[currentListIndexSelected]["visited"] = false;
-              AppValues.fileId = selectedImageId;
+              listOfImagesInfo[currentListIndexSelected!]["tobeDeleted"] = true;
+              listOfImagesInfo[currentListIndexSelected!]["important"] = false;
+              listOfImagesInfo[currentListIndexSelected!]["visited"] = false;
+              AppValues.fileId = selectedImageId!;
               url = Uri.parse(AppValues.getMarkAsRemoveUrll());
               debugPrint("URL $url");
             });
@@ -209,9 +195,17 @@ class _ListPhotosState extends State<ListPhotos> {
         selectedIndex: optionSelected,
       ),
       body: ListView.builder(
+        controller: scrollController,
         itemBuilder: (BuildContext ctx, int index) {
-          if(highlightColors.length > 5){
-            return
+          if (index == listOfImagesInfo.length) {
+            return LoadMoreFooter(
+              isLoading: isLoading,
+              hasMore: hasMore,
+              loadFailed: loadFailed,
+              onRetry: retryLoad,
+            );
+          }
+          return
               Padding(
                 padding: const EdgeInsets.all(3),
                 child: Column(
@@ -221,7 +215,7 @@ class _ListPhotosState extends State<ListPhotos> {
                         debugPrint("Current Image id ${listOfImagesInfo[index]["id"]}");
                         var currentSelectedItem = listOfImagesInfo[index];
                         selectedImageId = currentSelectedItem["id"];
-                        AppValues.fileId = selectedImageId;
+                        AppValues.fileId = selectedImageId!;
                         debugPrint(
                             "Current selected image index ${currentSelectedItem["id"]}");
                         getFileInfoAndUpdateStatus(currentSelectedItem);
@@ -235,18 +229,16 @@ class _ListPhotosState extends State<ListPhotos> {
                         );
                         setState(() {
                           currentListIndexSelected = index;
-                          highlightColors[index] = Colors.green;
-                          for (var i = 0; i < highlightColors.length; i++) {
-                            if (i != index) {
-                              highlightColors[i] = Colors.blue;
-                            }
-                          }
                         });
                       },
                       child: Container(
                         decoration: BoxDecoration(
                           border:
-                          Border.all(color: highlightColors[index], width: 6),
+                          Border.all(
+                              color: index == currentListIndexSelected
+                                  ? Colors.green
+                                  : Colors.blue,
+                              width: 6),
                           borderRadius: BorderRadius.circular(15),
                           // gradient: const LinearGradient(
                           //     begin: Alignment.topRight,
@@ -262,9 +254,8 @@ class _ListPhotosState extends State<ListPhotos> {
                           children: <Widget>[
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
-                                fit: BoxFit.cover,
-                                AppValues.getImageShrunkUrlUsingIndex(
+                              child: PhotoListImage(
+                                url: AppValues.getImageShrunkUrlUsingIndex(
                                     listOfImagesInfo[index]["id"].toString()),
                               ),
                             ),
@@ -313,12 +304,9 @@ class _ListPhotosState extends State<ListPhotos> {
                   ],
                 ),
               );
-          }else{
-            return const CircularProgressIndicator();
-          }
-
         },
-        itemCount: listOfImagesInfo.length,
+        // One extra row for the loading / end-of-list footer.
+        itemCount: listOfImagesInfo.length + 1,
       ),
     );
   }
