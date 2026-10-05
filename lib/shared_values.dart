@@ -112,6 +112,11 @@ class AppValues {
     return '$host/videos/$id/$action';
   }
 
+  /// filter: 'all', 'important', 'visited' or 'deleted'.
+  static String getSlideshowPhotosUrl(String fromCreatedDate, String filter) {
+    return '$host/photos/slideshow?createdDate=${Uri.encodeQueryComponent(fromCreatedDate)}&filter=$filter';
+  }
+
   static String getNextSetOfImportantImagesInfo([String? fromCreatedDate]) {
     return '$host/important/photos/getNextSet?createdDate=${fromCreatedDate ?? importantPhotosDate}';
   }

@@ -6,6 +6,7 @@ import 'package:flutter_application_1/ShowVideo.dart';
 import 'package:flutter_application_1/selected_photos.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:flutter_application_1/show_qr_code_photo.dart';
+import 'package:flutter_application_1/slideshow_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -32,7 +33,8 @@ class _PhotosPageState extends State<PhotosPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(children: [
+        body: SingleChildScrollView(
+            child: Column(children: [
       const SizedBox(height: 33),
       AppUtility.createAnimationButton(
           "Categorise Photos",
@@ -69,7 +71,19 @@ class _PhotosPageState extends State<PhotosPage> {
           2, () {
         onQrCodeControllerButtonPressed();
       }),
-    ]));
+      const SizedBox(height: 12),
+      AppUtility.createAnimationButton(
+          "Slideshow",
+          Colors.amberAccent,
+          200,
+          MediaQuery.of(context).size.width,
+          const Color.fromARGB(40, 60, 27, 109),
+          const Color.fromARGB(255, 26, 163, 255),
+          40,
+          2, () {
+        onSlideshowButtonPressed();
+      }),
+    ])));
   }
 
   void onCategorisePhotosButtonPressed() {
@@ -104,6 +118,57 @@ class _PhotosPageState extends State<PhotosPage> {
             }
         });
   }
+  /// Asks the start date, then which photos, then starts the slideshow.
+  Future<void> onSlideshowButtonPressed() async {
+    final DateTime? selectedDate = await AppUtility.datePicker(context);
+    if (selectedDate == null || !mounted) return;
+    final String? filter = await askSlideshowFilter();
+    if (filter == null || !mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext buildContext) {
+          return SlideshowPage(
+              startDate: selectedDate.toString(), filter: filter);
+        },
+      ),
+    );
+  }
+
+  /// 'all', 'important', 'visited' or 'deleted', null when cancelled.
+  Future<String?> askSlideshowFilter() {
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return SimpleDialog(
+          title: const Text('Which photos?'),
+          children: [
+            slideshowOption(dialogContext, 'all', 'All', Icons.photo_library,
+                Colors.blue),
+            slideshowOption(dialogContext, 'important', 'Important',
+                Icons.favorite, Colors.green),
+            slideshowOption(dialogContext, 'visited', 'Visited',
+                Icons.view_array, Colors.lightBlue),
+            slideshowOption(
+                dialogContext, 'deleted', 'Deleted', Icons.delete, Colors.red),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget slideshowOption(BuildContext dialogContext, String filter,
+      String label, IconData icon, Color color) {
+    return SimpleDialogOption(
+      onPressed: () => Navigator.pop(dialogContext, filter),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      child: Row(children: [
+        Icon(icon, color: color),
+        const SizedBox(width: 16),
+        Text(label, style: const TextStyle(fontSize: 18)),
+      ]),
+    );
+  }
+
   void onQrCodeControllerButtonPressed() {
     Navigator.of(context).push(
       MaterialPageRoute(

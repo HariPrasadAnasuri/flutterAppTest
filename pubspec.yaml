@@ -41,6 +41,8 @@ dependencies:
   sn_progress_dialog: ^1.1.3
   image_save: ^5.0.0
   better_player: 0.0.83
+  # Keeps the screen on during the slideshow; same version better_player already uses
+  wakelock: ^0.6.2
   async: ^2.11.0
   flutter_animated_button: ^2.0.3
   google_fonts: ^5.1.0
