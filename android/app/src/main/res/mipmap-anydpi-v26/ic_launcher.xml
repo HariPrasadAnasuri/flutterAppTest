@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 8+: launchers only show the middle 72dp of the 108dp icon, so
+     the photo is inset to exactly that area to keep the whole face visible.
+     The background colour only shows during launcher animations. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/ic_launcher_background"/>
+    <foreground>
+        <inset
+            android:drawable="@mipmap/ic_launcher_foreground"
+            android:inset="16.67%" />
+    </foreground>
+</adaptive-icon>

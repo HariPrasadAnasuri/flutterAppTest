@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/paged_photo_list.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:wakelock/wakelock.dart';
@@ -34,6 +35,12 @@ class _SlideshowPageState extends State<SlideshowPage> with PagedPhotos {
   int intervalSeconds = 5;
   bool playing = true;
   bool showControls = true;
+  // Hides the controls again while playing, see showControlsForAWhile
+  Timer? hideControlsTimer;
+  static const Duration hideControlsAfter = Duration(seconds: 4);
+  // Has the TV remote keys while the controls are hidden
+  final FocusNode pageFocus = FocusNode(debugLabel: 'Slideshow');
+  final FocusNode playButtonFocus = FocusNode(debugLabel: 'Slideshow play');
   // Photos whose full image is downloaded, the slideshow waits for these
   final Set<int> readyPhotoIds = {};
 
@@ -59,7 +66,10 @@ class _SlideshowPageState extends State<SlideshowPage> with PagedPhotos {
   void dispose() {
     Wakelock.disable();
     timer?.cancel();
+    hideControlsTimer?.cancel();
     pageController.dispose();
+    pageFocus.dispose();
+    playButtonFocus.dispose();
     super.dispose();
   }
 
@@ -68,6 +78,63 @@ class _SlideshowPageState extends State<SlideshowPage> with PagedPhotos {
     if (!mounted) return;
     precacheNext(0);
     startTimer();
+    // The controls show briefly at the start, then only the photos
+    if (playing && listOfImagesInfo.isNotEmpty) showControlsForAWhile();
+  }
+
+  /// Shows the controls; while playing they hide again after
+  /// [hideControlsAfter] without use. When paused they stay.
+  void showControlsForAWhile({bool focusPlayButton = false}) {
+    hideControlsTimer?.cancel();
+    if (!showControls) setState(() => showControls = true);
+    if (focusPlayButton) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) playButtonFocus.requestFocus();
+      });
+    }
+    if (playing) hideControlsTimer = Timer(hideControlsAfter, hideControls);
+  }
+
+  void hideControls() {
+    hideControlsTimer?.cancel();
+    if (!mounted) return;
+    setState(() => showControls = false);
+    // The focused button is gone, keep the remote keys on the page
+    pageFocus.requestFocus();
+  }
+
+  /// TV remote / keyboard. With the controls hidden: Left/Right change the
+  /// photo and OK/Up/Down bring the controls back (Back still leaves). With
+  /// them showing, keys move between the buttons as usual and keep the
+  /// controls up.
+  KeyEventResult onKey(FocusNode node, KeyEvent event) {
+    if (event is KeyUpEvent) return KeyEventResult.ignored;
+    final key = event.logicalKey;
+    if (key == LogicalKeyboardKey.mediaPlayPause) {
+      if (event is KeyDownEvent) setPlaying(!playing);
+      return KeyEventResult.handled;
+    }
+    if (showControls) {
+      showControlsForAWhile();
+      return KeyEventResult.ignored;
+    }
+    if (key == LogicalKeyboardKey.arrowLeft) {
+      if (event is KeyDownEvent) showPreviousPhoto();
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowRight) {
+      if (event is KeyDownEvent) showNextPhoto(waitForDownload: false);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.select ||
+        key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter ||
+        key == LogicalKeyboardKey.arrowUp ||
+        key == LogicalKeyboardKey.arrowDown) {
+      if (event is KeyDownEvent) showControlsForAWhile(focusPlayButton: true);
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
   }
 
   String shrunkImageUrl(Map photo) {
@@ -109,6 +176,8 @@ class _SlideshowPageState extends State<SlideshowPage> with PagedPhotos {
     } else {
       timer?.cancel();
     }
+    // Paused: the controls stay. Playing: they hide again after a while.
+    showControlsForAWhile();
   }
 
   /// [waitForDownload]: the timer waits until the next full photo is
@@ -193,12 +262,18 @@ class _SlideshowPageState extends State<SlideshowPage> with PagedPhotos {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(children: [
-        Positioned.fill(child: slides()),
-        if (showControls) Positioned(top: 0, left: 0, right: 0, child: topBar()),
-        if (showControls && listOfImagesInfo.isNotEmpty)
-          Positioned(bottom: 0, left: 0, right: 0, child: bottomBar()),
-      ]),
+      body: Focus(
+        focusNode: pageFocus,
+        autofocus: true,
+        onKeyEvent: onKey,
+        child: Stack(children: [
+          Positioned.fill(child: slides()),
+          if (showControls)
+            Positioned(top: 0, left: 0, right: 0, child: topBar()),
+          if (showControls && listOfImagesInfo.isNotEmpty)
+            Positioned(bottom: 0, left: 0, right: 0, child: bottomBar()),
+        ]),
+      ),
     );
   }
 
@@ -220,7 +295,7 @@ class _SlideshowPageState extends State<SlideshowPage> with PagedPhotos {
       return Center(child: child);
     }
     return GestureDetector(
-      onTap: () => setState(() => showControls = !showControls),
+      onTap: () => showControls ? hideControls() : showControlsForAWhile(),
       child: PageView.builder(
         controller: pageController,
         itemCount: listOfImagesInfo.length,
@@ -304,9 +379,13 @@ class _SlideshowPageState extends State<SlideshowPage> with PagedPhotos {
               color: Colors.white,
               iconSize: 36,
               icon: const Icon(Icons.skip_previous),
-              onPressed: showPreviousPhoto,
+              onPressed: () {
+                showPreviousPhoto();
+                showControlsForAWhile();
+              },
             ),
             IconButton(
+              focusNode: playButtonFocus,
               tooltip: playing ? 'Pause' : 'Play',
               color: Colors.white,
               iconSize: 48,
@@ -318,11 +397,17 @@ class _SlideshowPageState extends State<SlideshowPage> with PagedPhotos {
               color: Colors.white,
               iconSize: 36,
               icon: const Icon(Icons.skip_next),
-              onPressed: () => showNextPhoto(waitForDownload: false),
+              onPressed: () {
+                showNextPhoto(waitForDownload: false);
+                showControlsForAWhile();
+              },
             ),
             const SizedBox(width: 16),
             TextButton.icon(
-              onPressed: changeInterval,
+              onPressed: () {
+                changeInterval();
+                showControlsForAWhile();
+              },
               icon: const Icon(Icons.timer, color: Colors.white),
               label: Text('${intervalSeconds}s',
                   style: const TextStyle(color: Colors.white, fontSize: 16)),

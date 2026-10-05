@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Soft green from the photo's background -->
+    <color name="ic_launcher_background">#A9B98A</color>
+</resources>
