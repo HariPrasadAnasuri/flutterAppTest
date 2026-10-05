@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/list_photos.dart';
-import 'package:flutter_application_1/ShowVideo.dart';
+import 'package:flutter_application_1/list_videos.dart';
 import 'package:flutter_application_1/selected_photos.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:flutter_application_1/show_qr_code_photo.dart';
@@ -67,35 +67,31 @@ class _VideosPageState extends State<VideosPage> {
         ));
   }
   void onCategoriseVideosButtonPressed() {
-    AppUtility.datePicker(context).then((selectedDate) => {
-      if (selectedDate != null)
-        {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (BuildContext buildContext) {
-                return const ShowVideo();
-              },
-            ),
-          )
-        }
-    });
+    openVideoList('notReviewed', 'Categorize videos');
   }
 
   void onChosenVideosButtonPressed() {
-    AppUtility.datePicker(context).then((selectedDate) => {
-      if (selectedDate != null)
-        {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (BuildContext buildContext) {
-                AppValues.dateForVideos = selectedDate.toString();
-                debugPrint(
-                    "Selected date: ${AppValues.importantPhotosDate}");
-                return const ShowVideo();
-              },
-            ),
-          )
-        }
+    openVideoList('important', 'Chosen videos');
+  }
+
+  /// Opens the list of videos from the date picked; filter: 'notReviewed'
+  /// (not marked yet) or 'important'.
+  void openVideoList(String filter, String title) {
+    AppUtility.datePicker(context).then((selectedDate) {
+      if (selectedDate == null || !mounted) return;
+      // Also the date the TV controller page starts from
+      AppValues.dateForVideos = selectedDate.toString();
+      debugPrint("Selected date for videos: ${AppValues.dateForVideos}");
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (BuildContext buildContext) {
+            return ListVideos(
+                startDate: selectedDate.toString(),
+                filter: filter,
+                title: title);
+          },
+        ),
+      );
     });
   }
 }

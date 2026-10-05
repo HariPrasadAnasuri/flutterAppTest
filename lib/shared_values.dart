@@ -93,6 +93,21 @@ class AppValues {
     return '$host/videos/$id';
   }
 
+  /// filter: 'notReviewed' (not marked yet) or 'important'.
+  static String getNextSetOfVideosUrl(String fromCreatedDate, String filter) {
+    return '$host/videos/getNextSet?createdDate=${Uri.encodeQueryComponent(fromCreatedDate)}&filter=$filter';
+  }
+
+  static String getVideoThumbnailUrl(id) {
+    return '$host/videos/$id/thumbnail';
+  }
+
+  /// action: 'visited', 'important' or 'remove'. Unlike the photo urls this
+  /// doesn't move the user's photo progress.
+  static String getMarkVideoUrl(id, String action) {
+    return '$host/videos/$id/$action';
+  }
+
   static String getNextSetOfImportantImagesInfo([String? fromCreatedDate]) {
     return '$host/important/photos/getNextSet?createdDate=${fromCreatedDate ?? importantPhotosDate}';
   }

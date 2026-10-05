@@ -106,8 +106,11 @@ mixin PagedPhotos<T extends StatefulWidget> on State<T> {
 /// Thumbnail used in the photo lists. Keeps a fixed-height placeholder while
 /// the image downloads so the list doesn't jump, and shows an icon on failure.
 class PhotoListImage extends StatelessWidget {
-  const PhotoListImage({super.key, required this.url});
+  const PhotoListImage(
+      {super.key, required this.url, this.errorIcon = Icons.broken_image});
   final String url;
+  // Shown when the image can't be loaded
+  final IconData errorIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -133,11 +136,11 @@ class PhotoListImage extends StatelessWidget {
           ),
         );
       },
-      errorBuilder: (context, error, stackTrace) => const AspectRatio(
+      errorBuilder: (context, error, stackTrace) => AspectRatio(
         aspectRatio: 4 / 3,
         child: ColoredBox(
           color: Colors.black12,
-          child: Center(child: Icon(Icons.broken_image, size: 64)),
+          child: Center(child: Icon(errorIcon, size: 64)),
         ),
       ),
     );
@@ -153,11 +156,14 @@ class LoadMoreFooter extends StatelessWidget {
     required this.hasMore,
     required this.loadFailed,
     required this.onRetry,
+    this.itemName = 'photos',
   });
   final bool isLoading;
   final bool hasMore;
   final bool loadFailed;
   final VoidCallback onRetry;
+  // Used in the messages, e.g. "No more photos"
+  final String itemName;
 
   @override
   Widget build(BuildContext context) {
@@ -168,10 +174,10 @@ class LoadMoreFooter extends StatelessWidget {
       child = TextButton.icon(
         onPressed: onRetry,
         icon: const Icon(Icons.refresh),
-        label: const Text("Couldn't load more photos. Tap to retry"),
+        label: Text("Couldn't load more $itemName. Tap to retry"),
       );
     } else if (!hasMore) {
-      child = const Text('No more photos');
+      child = Text('No more $itemName');
     } else {
       child = const SizedBox.shrink();
     }
