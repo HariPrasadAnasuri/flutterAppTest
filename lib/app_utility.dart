@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animated_button/flutter_animated_button.dart';
+import 'package:flutter_application_1/large_date_picker.dart';
 import 'package:flutter_application_1/shared_values.dart';
 import 'package:flutter_application_1/tv_date_picker.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -31,6 +32,13 @@ class AppUtility{
     required DateTime firstDate,
     required DateTime lastDate,
   }) {
+    // There are no photos or videos from the future: stop at the end of the
+    // current month
+    final now = DateTime.now();
+    final endOfThisMonth = DateTime(
+        now.year, now.month, DateUtils.getDaysInMonth(now.year, now.month));
+    if (lastDate.isAfter(endOfThisMonth)) lastDate = endOfThisMonth;
+    if (initialDate.isAfter(lastDate)) initialDate = lastDate;
     if (FocusManager.instance.highlightMode == FocusHighlightMode.traditional) {
       return showTvDatePicker(
           context: context,
@@ -38,7 +46,8 @@ class AppUtility{
           firstDate: firstDate,
           lastDate: lastDate);
     }
-    return showDatePicker(
+    // Phones and tablets: big, high contrast picker that works with TalkBack
+    return showLargeDatePicker(
         context: context,
         initialDate: initialDate,
         firstDate: firstDate,

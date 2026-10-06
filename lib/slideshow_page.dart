@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/paged_photo_list.dart';
 import 'package:flutter_application_1/shared_values.dart';
+import 'package:http/http.dart' as http;
+import 'package:permission_handler/permission_handler.dart';
 import 'package:wakelock/wakelock.dart';
 
 /// Full screen slideshow of the photos from [startDate] on that match
@@ -43,6 +45,10 @@ class _SlideshowPageState extends State<SlideshowPage> with PagedPhotos {
   final FocusNode playButtonFocus = FocusNode(debugLabel: 'Slideshow play');
   // Photos whose full image is downloaded, the slideshow waits for these
   final Set<int> readyPhotoIds = {};
+  // Saves photos to the gallery, see MainActivity.kt
+  static const MethodChannel galleryChannel =
+      MethodChannel('my_family/gallery');
+  bool saving = false;
 
   // Only the paging of the mixin is used here, the ListView parts aren't.
   @override
@@ -251,6 +257,43 @@ class _SlideshowPageState extends State<SlideshowPage> with PagedPhotos {
     }
   }
 
+  /// Saves the full photo shown now to Pictures/My Family on the device.
+  Future<void> saveCurrentPhoto() async {
+    if (saving || listOfImagesInfo.isEmpty) return;
+    final Map photo = listOfImagesInfo[currentIndex];
+    setState(() => saving = true);
+    try {
+      final response =
+          await http.get(Uri.parse(AppValues.getImageUrlUsingId(photo['id'])));
+      if (response.statusCode != 200) {
+        throw Exception('HTTP ${response.statusCode}');
+      }
+      String mimeType = response.headers['content-type'] ?? 'image/jpeg';
+      if (!mimeType.startsWith('image/')) mimeType = 'image/jpeg';
+      String extension = mimeType.substring('image/'.length).split(';').first;
+      if (extension == 'jpeg') extension = 'jpg';
+      final arguments = {
+        'bytes': response.bodyBytes,
+        'name': 'photo_${photo['id']}.$extension',
+        'mimeType': mimeType,
+      };
+      try {
+        await galleryChannel.invokeMethod('saveImage', arguments);
+      } on PlatformException catch (e) {
+        // Android 9 and older need the storage permission first
+        if (e.code != 'PERMISSION' ||
+            !(await Permission.storage.request()).isGranted) rethrow;
+        await galleryChannel.invokeMethod('saveImage', arguments);
+      }
+      if (mounted) showMessage('Saved to Pictures/My Family');
+    } catch (e) {
+      debugPrint('Saving photo ${photo['id']} failed: $e');
+      if (mounted) showMessage("Couldn't save the photo");
+    } finally {
+      if (mounted) setState(() => saving = false);
+    }
+  }
+
   void changeInterval() {
     final int next =
         (intervals.indexOf(intervalSeconds) + 1) % intervals.length;
@@ -411,6 +454,22 @@ class _SlideshowPageState extends State<SlideshowPage> with PagedPhotos {
               icon: const Icon(Icons.timer, color: Colors.white),
               label: Text('${intervalSeconds}s',
                   style: const TextStyle(color: Colors.white, fontSize: 16)),
+            ),
+            IconButton(
+              tooltip: 'Download',
+              color: Colors.white,
+              iconSize: 32,
+              icon: saving
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white))
+                  : const Icon(Icons.download),
+              onPressed: () {
+                saveCurrentPhoto();
+                showControlsForAWhile();
+              },
             ),
           ],
         ),
